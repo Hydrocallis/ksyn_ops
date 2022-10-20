@@ -39,11 +39,11 @@ def bool_check(context):
 
     # ここからファイル名をデコレーションしていく
 
-    # 選択したオブジェクトの名前と入力したファイル名を入れる
+    # 選択したオブジェクトの名前と入力したファイル名と選択したファイル名を入れる
     if props.fbx_blenderfilename__bool == True:
-        fbx_exportsavefile = blender_fbxfilename +"_" + props.fbx_filename
+        fbx_exportsavefile = blender_fbxfilename +"_" + props.fbx_filename +"_"+ bpy.context.scene.filenameset
     elif props.fbx_blenderfilename__bool == False:
-        fbx_exportsavefile = props.fbx_filename
+        fbx_exportsavefile = props.fbx_filename+  "_" + bpy.context.scene.filenameset
 
     # 選択したオブジェクトの名前を仕様
     if props.fbx_selectfilename_bool == True:

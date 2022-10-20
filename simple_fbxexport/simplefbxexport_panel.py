@@ -34,6 +34,12 @@ class SIMPLEFBXECPORT_PT_SETTINGFBXEXPORT(Panel):
         row = layout.row()
 
         row.prop(props, "fbx_filename")
+
+        row = layout.row(align=True)
+        row.prop(context.scene, "filenameset", text="")
+        row.operator("simplefbxexport.add", text="", icon="ADD")
+        row.operator("simplefbxexport.remove", text="", icon="REMOVE")
+        
         row = layout.row()
         row.prop(props, "fbx_selectfilename_bool")
         row = layout.row()
