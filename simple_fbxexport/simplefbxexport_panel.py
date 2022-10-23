@@ -30,11 +30,16 @@ class SIMPLEFBXECPORT_PT_SETTINGFBXEXPORT(Panel):
         row.label(text="※コレクショ名を優先")
         row = layout.row()
         
-        row.prop(props, "fbx_blenderfilename__bool")
+        row.prop(props, "fbx_blenderfilename__bool",)
         row = layout.row()
 
-        row.prop(props, "fbx_filename")
+        row.label(text="オリジナルネーム")
+        row = layout.row()
+        row.prop(props, "fbx_filename",text="")
 
+        row = layout.row()
+
+        row.label(text="保存した名前リスト")
         row = layout.row(align=True)
         row.prop(context.scene, "filenameset", text="")
         row.operator("simplefbxexport.add", text="", icon="ADD")
