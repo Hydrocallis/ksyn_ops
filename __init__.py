@@ -26,7 +26,6 @@ if "bpy" in locals():
     "menu",
 
 
-    "simple_fbxexport",
     ]
     for module in reloadable_modules: # リスト内のものがすでにあれば、reloadを発動する
         if module in locals():
@@ -38,7 +37,7 @@ from . import operators
 from . import properties
 from . import panel
 from . import menu
-from . import simple_fbxexport
+
 
 
 
@@ -486,7 +485,6 @@ def register():
     properties.register()
 
 
-    simple_fbxexport.register()
 
     # 通常の３Dモードの（オブジェクトモードでしか何故か登録できない）キーマップ登録
     wm = bpy.context.window_manager
@@ -519,7 +517,6 @@ def unregister():
     properties.unregister()
 
 
-    simple_fbxexport.unregister()
     wm = bpy.context.window_manager
     kc = wm.keyconfigs.addon
     if kc:
