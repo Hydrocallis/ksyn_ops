@@ -8,7 +8,7 @@ from bpy.types import (
         )
 
 class PIE_MT_ViewNumpad(Menu):
-    bl_idname = "PIE_MT_viewnumpad"
+    bl_idname = "PIE_MT_viewnumpad_mypanel"
     bl_label = "CUSYANG_Pie Views Menu_"
     bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
 
