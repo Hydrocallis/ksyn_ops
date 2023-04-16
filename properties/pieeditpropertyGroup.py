@@ -1,5 +1,6 @@
 
-import bpy, sys, pathlib
+import bpy, sys, pathlib,re
+from ..utils.englishname_trans import remove_japanese
 
 from bpy.types import (
         Menu,
@@ -20,8 +21,111 @@ from bpy.props import (
                         StringProperty
                         )
 
+def get_translang(eng,trans):
+    prev = bpy.context.preferences.view
+    if prev.language =='ja_JP' and prev.use_translate_interface == True:
+        return trans
+    else:
+        return eng
 
-class MyEDITPIEPropertyGroup(PropertyGroup):
+
+def get_object_list_materialst(scene, context):
+    index_obj_imagelist =enumerate(bpy.data.images)
+    imagelist=[]
+    for index,image in index_obj_imagelist:
+        try:
+            engjpimage=remove_japanese(image.name)
+            if image.name =='Render Result' or image.name == 'Viewer Node':
+                pass
+            elif image.name != engjpimage:
+                pass
+            else:
+                imagelist.append((image.name,engjpimage,image.name,index))
+        except AttributeError:
+            pass
+    return imagelist
+
+
+class fileexportbakeing():
+    # (識別子, UI表示名, 説明文)
+    bake_types = (
+  
+    ("COMBINED", "COMBINED", "", 1),
+    ("DIFFUSE", "DIFFUSE", "", 2),
+    ("NORMAL", "NORMAL", "", 3),
+        )
+    extentionitem = (
+  
+    (".png", "PNG", "", 1),
+    (".jpg", "JPEG", "", 2),
+        )
+    
+    image_sizeitems = (
+  
+    ("128", "128", "", 1),
+    ("256", "256", "", 2),
+    ("512", "512", "", 3),
+    ("1024", "1024", "", 4),
+    ("2048", "2048", "", 5),
+    ("4096", "4096", "", 6),
+        )
+    
+
+
+    bake_type : EnumProperty(
+            name = "Bake Type",
+            items = bake_types
+            )
+    
+    filename_ext : EnumProperty(
+            name = get_translang('Extension','拡張子'),
+            items = extentionitem
+            )
+    
+    image_sizes: bpy.props.EnumProperty(
+
+        name=get_translang('Bake Image sizes','ベイク画像の大きさ'),
+        items=image_sizeitems,
+        default='1024',
+        # options={'HIDDEN'}
+    )
+    savescale: bpy.props.EnumProperty(
+
+        name=get_translang('Image sizes','保存画像の大きさ'),
+        items=image_sizeitems,
+        default='1024',
+        # options={'HIDDEN'}
+    )
+
+    imagelist: bpy.props.EnumProperty(
+
+        name=get_translang('Image sizes','ベイク先画像ノードがあるマテリアル'),
+        items=get_object_list_materialst,
+        # default='1024',
+        
+        # options={'HIDDEN'}
+    )
+
+    #     # 
+    fullpath : bpy.props.StringProperty(
+        name="fullpath",
+        default="",
+        options={'HIDDEN'}
+        )
+
+    samples : IntProperty(name="Samples",default=8, min=0,)
+    margin : IntProperty(name="Margin",default=16, min=0,subtype="PIXEL",)
+    quality : IntProperty(name="Quality",default=90, min=0, max=100,subtype="PERCENTAGE",)
+    compression : IntProperty(name="Compression",default=15, min=0, max=100,subtype="PERCENTAGE",)
+    add_mat_name : BoolProperty(name=get_translang('Add material name','ベイク画像にマテリアルネームを追加'))
+    Bake_to_existing_node_texture : BoolProperty(name=get_translang('Bake to existing node texture','既存のノードテクスチャにベイクする'))
+    trans_lang_english : BoolProperty(name=get_translang('Convert file names to English words only.','ファイル名を英単語のみ変換しておく。'))
+    use_pass_direct : BoolProperty(name="Direct",default=False)
+    use_pass_indirect : BoolProperty(name="Indirect",default=False)
+    
+
+ 
+class MyEDITPIEPropertyGroup(PropertyGroup,fileexportbakeing):
     # インスタンスミラーのXかYかのブール
     axis = (
         ("X", "X-axis", ""),      # (識別子, UI表示名, 説明文)
@@ -124,3 +228,7 @@ class MyEDITPIEPropertyGroup(PropertyGroup):
                 update = update_func, 
                 poll=armature_poll
                                                 )
+    
+    fileexportbakeing()
+
+

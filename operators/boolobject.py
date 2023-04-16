@@ -43,11 +43,46 @@ class PIE3D_OT_BoolOnOff(Operator):
 
         return {'FINISHED'}
 
-# 対象のオブジェクトを指定したコレクションに入れる
-def linkcolobject(sel_obj):
+def get_translang(eng,trans):
+    prev = bpy.context.preferences.view
+    if prev.language =='ja_JP' and prev.use_translate_interface == True:
+        return trans
+    else:
+        return eng
+
+
+def applyboolean(obj):
+    togle = None
+
+    if bpy.context.mode == 'EDIT_MESH':
+        togle = "EDIT_MESH"
+        bpy.ops.object.editmode_toggle()
+
+
+    for mod in obj.modifiers:
+        if mod.type == 'BOOLEAN':
+            
+            if mod.object != None:
+                bpy.ops.object.modifier_apply(modifier=mod.name)
+                
+            elif mod.object == None:
+                bpy.ops.object.modifier_remove(modifier=mod.name)
+
+
+
+    if togle == 'EDIT_MESH':
+        bpy.ops.object.editmode_toggle()
+
+
+def wireon(sel_obj):
     sel_obj.display_type = 'WIRE'
     sel_obj.hide_render = True
+
+
+# 対象のオブジェクトを指定したコレクションに入れる
+def linkcolobject(sel_obj):
     col="BOOL"
+
     # ブールがすでにあるとき
     try:
         bpy.data.collections[col].objects.link(sel_obj)
@@ -61,6 +96,7 @@ def linkcolobject(sel_obj):
         right_collection.color_tag = 'COLOR_01'
         bpy.data.collections[col].objects.link(sel_obj)
 
+
 # 指定のオブジェクトを指定のコレクション以外アンリンクする
 def checkunlinkcol(selectobj, selcolname):
     for checkcol in bpy.data.collections:
@@ -73,18 +109,16 @@ def checkunlinkcol(selectobj, selcolname):
             for colobj in checkcol.objects:
                 
                 if colobj.name == selectobj.name:
-                    print(colobj.name)
+                    # print(colobj.name)
                     bpy.data.collections[checkcol.name].objects.unlink(colobj)
                     
 
-
-
 # アクティブなオブジェクトにブールをかける
-def selected_mulch(obs,activeob,parent_bool):
+def selected_mulch(self, obs,activeob,parent_bool):
 
     for sel_obj in obs:
         # アクティブなオブジェクトにブールモディファイアを適応
-        bool = activeob.modifiers.new(name='booly', type='BOOLEAN')
+        bool = activeob.modifiers.new(name='ksynbooly', type='BOOLEAN')
         # 選択したオブジェクトを適応
         bool.object = sel_obj
         bool.operation = 'DIFFERENCE'
@@ -92,8 +126,10 @@ def selected_mulch(obs,activeob,parent_bool):
         
         # アクティブオブジェクト以外をブールフォルダに移動する。（既存のコレクションはアンリンク）
         if bpy.context.view_layer.objects.active != sel_obj:
-            linkcolobject(sel_obj)
-            checkunlinkcol(sel_obj, "BOOL")
+            wireon(sel_obj)
+            if self.move_colection_bool == True:
+                linkcolobject(sel_obj)
+                checkunlinkcol(sel_obj, "BOOL")
 
     #　最後に選択したオブジェクトにペアレントするかどうか。
     if parent_bool == True:
@@ -101,8 +137,17 @@ def selected_mulch(obs,activeob,parent_bool):
     else:
         pass
 
+
+# 最後のオブジェクトをブールコレクションに移動
+def collectionmove(activeob):
+    wireon(activeob)
+    if bpy.context.view_layer.objects.active == activeob:
+        linkcolobject(activeob)
+        checkunlinkcol(activeob, "BOOL")
+
+
 # 選択したオブジェクトにアクティブなオブジェクトのブールをかける
-def selected_single_bool(obs,activeob):
+def selected_single_bool(self, obs,activeob):
     
     for sel_obj in obs:
         # アクティブなオブジェクトにブールモディファイアを適応
@@ -111,15 +156,23 @@ def selected_single_bool(obs,activeob):
         bool.object = activeob
         bool.operation = 'DIFFERENCE'
         bool.solver = 'FAST'
-
         # 最後のオブジェクトをブールコレクションに移動
-        if bpy.context.view_layer.objects.active == activeob:
-            linkcolobject(activeob)
-            checkunlinkcol(activeob, "BOOL")
+        if self.move_colection_bool == True:
+            collectionmove(activeob)
+        else:
+            wireon(activeob)
 
 
+def draw_main(self):
+    if self.cmd =="applyboolean":
+        pass
+    elif self.cmd =="simpleboolean":
 
-def main(selected_mulch_bool, parent_bool):
+        self.layout.prop(self,"parent_bool")
+        self.layout.prop(self,"selected_mulch_bool")
+        self.layout.prop(self,"move_colection_bool")
+
+def main(self, selected_mulch_bool, parent_bool):
 
     # 削りたい対象のオブジェクト（アクティブ）を定義
     activeob = bpy.context.active_object
@@ -132,30 +185,42 @@ def main(selected_mulch_bool, parent_bool):
 
     # 一つのオブジェクトだけ削りたい時（アクティブオブジェクト以外は非ブール）
     if selected_mulch_bool == True:
-        selected_mulch(obs,activeob,parent_bool)
+        selected_mulch(self, obs,activeob,parent_bool)
 
     # 複数のオブジェクトだけ削りたい時（アクティブオブジェクトは非ブール）
     else:
-        selected_single_bool(obs,activeob)
+        selected_single_bool(self, obs,activeob)
 
 
 class PIE3D_OT_SelectObjectBool(Operator):
     bl_idname = "object.selectobjectbool_operator"
-    bl_label = "最後に選択したオブジェクトをブール"
+    bl_label = "Simple Boolean"
     bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
     bl_options = {'REGISTER', 'UNDO'}
+
+    cmd: bpy.props.StringProperty(default="", options={'HIDDEN'})
+
     
     parent_bool: bpy.props.BoolProperty(
-                                    name='parent',
-                                    default=False,
+                                    name=get_translang('Parent','親子化'),
+                                    default=True,
                                     )
     selected_mulch_bool: bpy.props.BoolProperty(
-                                    name='selected_mulch_bool',
-                                    default=False,
+                                    name=get_translang('selected_mulch_bool','複数でブール'),
+                                    default=True,
+                                    )
+    
+    move_colection_bool: bpy.props.BoolProperty(
+                                    name=get_translang('move colection','コレクション移動'),
+                                    default=True,
                                     )
 
     def execute(self, context):
-
-        main(self.selected_mulch_bool,self.parent_bool)
+        if self.cmd =="applyboolean":
+            applyboolean(context.object)
+        else:
+            main(self, self.selected_mulch_bool, self.parent_bool)
     
         return {'FINISHED'}
+    def draw(self, context):
+        draw_main(self)

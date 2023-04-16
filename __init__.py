@@ -5,17 +5,54 @@
 # 中のININTファイルが読み込まれない仕様である。
 
 bl_info = {
-    "name": "custum_3d_view_pie",
+    "name": "KSYN OPS",
     "description": "Viewport custum",
-    "author": "kk",
-    "version": (0, 1, 1),
-    "blender": (2, 93, 0),
+    "author": "KSYN",
+    "version": (0, 1, 2),
+    "blender": (3, 2, 0),
     "location": "shift ctrl Q key",
     "warning": "",
     "doc_url": "",
-    "category": "MY"
+    "category": "KSYN"
     }
 
+
+
+
+# リロードモジュール　開始
+def reload_unity_modules(name):
+    import os
+    import importlib
+   
+    utils_modules = sorted([name[:-3] for name in os.listdir(os.path.join(__path__[0], "utils")) if name.endswith('.py')])
+
+    for module in utils_modules:
+        impline = "from . utils import %s" % (module)
+
+        # print("###hydoro unity reloading one %s" % (".".join([name] + ['utils'] + [module])))
+
+        exec(impline)
+        importlib.reload(eval(module))
+
+    modules = []
+
+    for path, module in modules:
+        if path:
+            impline = "from . %s import %s" % (".".join(path), module)
+        else:
+            impline = "from . import %s" % (module)
+
+        print("###hydoro unity reloading second %s" % (".".join([name] + path + [module])))
+
+        exec(impline)
+        importlib.reload(eval(module))
+
+if 'bpy' in locals():
+    reload_unity_modules(bl_info['name'])
+# リロードモジュール　終了
+
+
+# UTILIS以外のモジュールを再読み込み
 if "bpy" in locals():
     import importlib
     reloadable_modules = [ # リストに読み込むものをまとめる
@@ -25,8 +62,8 @@ if "bpy" in locals():
     "operators",
     "menu",
 
-
     ]
+
     for module in reloadable_modules: # リスト内のものがすでにあれば、reloadを発動する
         if module in locals():
             importlib.reload(locals()[module])
@@ -37,7 +74,6 @@ from . import operators
 from . import properties
 from . import panel
 from . import menu
-
 
 
 
@@ -183,8 +219,8 @@ class PIE_OT_LockTransforms(Operator):
 
         return {'FINISHED'}
 
-class pie1(Operator):
-    bl_idname = "object.pie1_operator"
+class OBJECT_OT_wiredisplay(Operator):
+    bl_idname = "object.wiredisplay_operator"
     bl_label = "オブジェクトにワイヤー表示"
     bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
 
@@ -210,27 +246,6 @@ class pie1(Operator):
 
         return {'FINISHED'}
 
-class pie2(Operator):
-    bl_idname = "object.pie2_operator"
-    bl_label = "メッシュ全選択"
-    bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
-
-
-    def execute(self, context):
-        ob = bpy.context.object
-        # 選択したオブジェクト
-        # https://blenderartists.org/t/first-python-coding-toggle-wire-display-for-entire-scene/634793
-
-        bpy.ops.mesh.select_all(action='SELECT')
-        return {'FINISHED'}
-
-class pie3(Operator):
-    bl_idname = "object.pie3_operator"
-    bl_label = "隠していた選択面を表示"
-
-    def execute(self, context):
-        bpy.ops.mesh.reveal()
-        return {'FINISHED'}
 
 class pie4(Operator):
     bl_idname = "object.pie4_operator"
@@ -240,13 +255,6 @@ class pie4(Operator):
         bpy.ops.mesh.hide(unselected=True)
         return {'FINISHED'}
 
-class pie7(Operator):
-    bl_idname = "object.pie7_operator"
-    bl_label = "subdivide"
-
-    def execute(self, context):
-        bpy.ops.mesh.subdivide()
-        return {'FINISHED'}
 
 class pie8(Operator):
     bl_idname = "object.pie8_operator"
@@ -288,20 +296,6 @@ class pie11(Operator):
         bpy.ops.object.transform_apply(location=False, rotation=True, scale=False)
         return {'FINISHED'}
 
-class pie15(Operator):
-    bl_idname = "object.pie15_operator"
-    bl_label = "mesh-x-mirror"
-
-    def execute(self, context):
-        bpy.ops.object.editmode_toggle()
-        bpy.ops.mesh.select_all(action='SELECT')
-        bpy.ops.mesh.bisect(plane_co=(0, 0, 0), plane_no=(-1, 0, 0), clear_inner=False, clear_outer=True, xstart=376, xend=376, ystart=225, yend=224, flip=False)
-        bpy.ops.object.modifier_add(type='MIRROR')
-        bpy.context.object.modifiers["Mirror"].use_clip = True
-        bpy.ops.object.editmode_toggle()
-
-        return {'FINISHED'}
-
 class pie18(Operator):
     bl_idname = "object.pie18_operator"
     bl_label = "フラット面を選択"
@@ -326,31 +320,6 @@ class pie20(Operator):
         bpy.ops.mesh.mark_seam(clear=False)
         return {'FINISHED'}
 
-class pie21(Operator):
-    bl_idname = "object.pie21_operator"
-    bl_label = "面オブジェクト分離"
-
-    def execute(self, context):
-        def obj_copy():
-# 選択した面をセパレートして別オブジェクト化するスクリプト
-            obj_name = bpy.context.active_object.name
-            print(obj_name)
-
-            bpy.ops.mesh.duplicate_move()
-            #obj_copy()
-            bpy.ops.mesh.separate(type='SELECTED')
-            bpy.ops.object.mode_set(mode='OBJECT')
-            obj2_name = bpy.context.selected_objects[1].name
-            print(obj2_name)
-            ## オブジェクトのアクティブ化
-            ob = bpy.context.scene.objects[obj2_name]   # maeno object wo sentaku# ここに指定したオブジェクトの名前をついかする
-            bpy.context.view_layer.objects.active = ob
-            
-            bpy.context.scene.objects[obj_name].select_set(False)
-            bpy.ops.object.mode_set(mode='EDIT')
-            bpy.ops.mesh.select_all(action='SELECT')
-        obj_copy()
-        return {'FINISHED'}
 
 # 廃止予定
 class pie22(Operator):
@@ -387,21 +356,15 @@ def draw(self, context, layout):
     col.prop(view, "use_translate_interface", text="Interface")
     col.prop(view, "use_translate_new_dataname", text="New Data")
 
-class CUSPIE23_OT_pie_operator(Operator):
-    bl_idname = "object.cuspie23_pie_operator"
-    bl_label = "OB＿MESH＿NAME"# 言語の切り替え
-    bl_description = '"object.pie23_operator\nオブジェクト名にメッシュ名前を入れ替え'
 
-# 実際の実行関数
-    def execute(self, context):
-        for ob in bpy.context.selected_objects:
-            ob.data.name = ob.name
-        return {'FINISHED'}
+
+
 # アドオンの項目の設定項目
 from bpy.types import Operator, AddonPreferences
 from bpy.props import StringProperty, IntProperty, BoolProperty
 
 addon_keymapscuspie = []
+
 
 class ExampleAddonPreferences(AddonPreferences):
     # this must match the add-on name, use '__package__'
@@ -450,6 +413,24 @@ class ExampleAddonPreferences(AddonPreferences):
                 layout.separator()
                 old_km_name = km.name
                 kmi = None
+
+# 辞書登録関数　開始
+import os,codecs,csv
+def GetTranslationDict():
+    dict = {}
+    # 直下に置かれているcsvファイルのパスを代入
+    path = os.path.join(os.path.dirname(__file__), "translation_dictionary.csv")
+    with codecs.open(path, 'r', 'utf-8') as f:
+        reader = csv.reader(f)
+        dict['ja_JP'] = {}
+        for row in reader:
+            for context in bpy.app.translations.contexts:
+                dict['ja_JP'][(context, row[1].replace('\\n', '\n'))] = row[0].replace('\\n', '\n')
+    return dict
+# 辞書登録関数　終わり
+
+
+
 # クラスの登録
 classes = (
             ExampleAddonPreferences,
@@ -457,22 +438,16 @@ classes = (
             PIE3D_OT_ColorPickupObject,
             PIE3D_OT_SubdivisionShow,
             PIE3D_OT_AmatureRestBool,
-            pie1,
-            pie2,
-            pie3,
+            OBJECT_OT_wiredisplay,
             pie4,
-            pie7,
             pie8,
             pie9,
             pie10,
             pie11,
-            pie15,
             pie18,
             pie19,
             pie20,
-            pie21,
             pie22,
-            CUSPIE23_OT_pie_operator,
             )
 
 def register():
@@ -508,6 +483,13 @@ def register():
 
     wm = bpy.context.window_manager
  
+
+ 	# 翻訳辞書の登録
+    try:
+        translation_dict = GetTranslationDict()
+        bpy.app.translations.register(__name__, translation_dict)
+    except: pass
+
 def unregister():
     for cls in classes:
         bpy.utils.unregister_class(cls)
@@ -524,6 +506,12 @@ def unregister():
         for km, kmi in addon_keymapscuspie:
             km.keymap_items.remove(kmi)
     addon_keymapscuspie.clear()
+
+	# 翻訳辞書の登録解除
+    try:
+        bpy.app.translations.unregister(__name__)
+    except: pass
+
 
 if __name__ == "__main__":
     register()

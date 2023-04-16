@@ -46,11 +46,11 @@ class PIE3D_OT_CopyAsset(Operator):
 
         link = False
 
-        print('###0-0###file full path', __file__)
-        print('###0-1###scriptname', p_file.name)
-        print('###0-2###asset filepath',filepath)
-        print('###0-3###asset exists', filepath.exists())
-        print('###0-0###', filepath)
+        # print('###0-0###file full path', __file__)
+        # print('###0-1###scriptname', p_file.name)
+        # print('###0-2###asset filepath',filepath)
+        # print('###0-3###asset exists', filepath.exists())
+        # print('###0-0###', filepath)
         # link all collections starting with 'MyCollection'
         with bpy.data.libraries.load(str(filepath), link=link) as (data_from, data_to):
             data_to.collections = [c for c in data_from.collections if c.startswith(coll_name)]

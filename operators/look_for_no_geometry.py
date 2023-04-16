@@ -12,7 +12,7 @@ from bpy.types import (
 
 class PIE3D_OT_look_for_no_geometry(Operator):
         bl_idname = 'object.look_for_no_geometry_operator'
-        bl_label = 'look_for_no_geometry_operator'
+        bl_label = 'Get empty geometry'
         # 自身のクラスの呼び出しにはSYSモジュールが必要
         bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
         bl_options = {'REGISTER', 'UNDO'}
@@ -20,28 +20,32 @@ class PIE3D_OT_look_for_no_geometry(Operator):
 
         def main(self):
             def meshver(obj):
-                # Get the active mesh
-                objmesh = obj.data
+                mever =None
+                if obj.type =="MESH":
+                    # Get the active mesh
+                    objmesh = obj.data
 
-                # Get a BMesh representation
-                bm = bmesh.new()   # create an empty BMesh
-                bm.from_mesh(objmesh)   # fill it in from a Mesh
+                    # Get a BMesh representation
+                    bm = bmesh.new()   # create an empty BMesh
+                    bm.from_mesh(objmesh)   # fill it in from a Mesh
 
-                # Modify the BMesh, can do anything here...
-                mever = len(bm.verts)
-                
+                    # Modify the BMesh, can do anything here...
+                    mever = len(bm.verts)
+                    
                 return mever
 
             def meshfaces(obj):
-                # Get the active mesh
-                objmesh = obj.data
+                mever =None
+                if obj.type =="MESH":
+                    # Get the active mesh
+                    objmesh = obj.data
 
-                # Get a BMesh representation
-                bm = bmesh.new()   # create an empty BMesh
-                bm.from_mesh(objmesh)   # fill it in from a Mesh
+                    # Get a BMesh representation
+                    bm = bmesh.new()   # create an empty BMesh
+                    bm.from_mesh(objmesh)   # fill it in from a Mesh
 
-                # Modify the BMesh, can do anything here...
-                mever = len(bm.faces)
+                    # Modify the BMesh, can do anything here...
+                    mever = len(bm.faces)
                 
                 return mever
 

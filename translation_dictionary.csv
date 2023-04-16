@@ -1,0 +1,19 @@
+逆,selected_mulch_bool
+簡単ブーリアン,Simple Boolean
+メッシュ操作関係,Mesh Oparator
+選択面分離,Mesh Separate
+メッシュの無いオブジェクトを削除,Mesh Empty Delete
+簡単回転,Simple Rotate
+マテリアルを削除,Delete Material
+クリーンアップ,CleanUp
+簡単ミラー,Mesh Mirror
+メッシュの変形,Mesh deformation
+メッシュの表示,Mesh Display
+メッシュの表示,Mesh Display
+選択関係,Slect Menu
+エンプティの挿入,Last select add empty
+空のジオメトリのみ選択,Get empty geometry
+選択箇所を原点に選択,Select area set origin
+パイパネル カラーピック,pie Setting Colorpic
+パイパネル アーマチュア,pie Setting Armture
+FBX出力 ,FBXEXPORT

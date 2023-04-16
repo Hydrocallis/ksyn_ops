@@ -39,7 +39,6 @@ class PIE3D_OT_ViewShading(Operator):
         )
 
     def execute(self, context):
-        print('###',self.material_enum)
         if self.material_enum == "1":
             context.space_data.shading.type = 'SOLID'
             context.space_data.shading.light = 'FLAT'
@@ -70,11 +69,10 @@ class PIE3D_OT_ViewShading(Operator):
 
 
         return {'FINISHED'}
+    def draw(self,context):
+        self.layout.prop(self,"material_enum", expand=True)
 
-    # def invoke(self, context, event):
 
-    #     wm = context.window_manager
-    #     return {'RUNNING_MODAL'}
 
 class PIE3D_OT_ViewShadingShowFace(Operator):
     """Tooltip"""

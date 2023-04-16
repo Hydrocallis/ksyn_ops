@@ -12,7 +12,7 @@ from bpy.types import (
 class PIE3D_OT_weightpaint_value_chnage(Operator):
     """Tooltip"""
     bl_idname = "object.weightpaint_value_chnage"
-    bl_label = "weightpaint_value_chnage"
+    bl_label = "Weightpaint value change"
     bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
     bl_options = {'REGISTER', 'UNDO'}
     
@@ -42,9 +42,7 @@ class PIE3D_OT_weightpaint_value_chnage(Operator):
 
     def invoke(self, context, event):
 
-            
-
-
+           
         return context.window_manager.invoke_props_dialog(self)
     
 
@@ -57,10 +55,7 @@ class PIE3D_OT_weightpaint_value_chnage(Operator):
         print("###CHange weight value", self.uvtex)
         cst_s=context.scene.tool_settings
         cst_s.unified_paint_settings.weight = float(self.uvtex)
-
-
-
-        
+       
         
    
         self.report({'INFO'}, self.uvtex)

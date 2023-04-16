@@ -10,11 +10,12 @@ from bpy.types import (
         
 class PIE3D_PT_PIESETTINGARM(Panel):
     """Creates a Panel in the Object properties window"""
-    bl_label = "pie setting panel armture"
+    bl_label = "pie Setting Armture"
     bl_idname = "OBJECT_PT_piesetting_arm"
+    bl_options = {'DEFAULT_CLOSED'}
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_category = "Tool"
+    bl_category = "KSYN"
     
 
 
@@ -32,11 +33,12 @@ class PIE3D_PT_PIESETTINGARM(Panel):
 
 class PIE3D_PT_PIESETTING(Panel):
     """Creates a Panel in the Object properties window"""
-    bl_label = "pie setting panel"
+    bl_label = "pie Setting Colorpic"
+    bl_options = {'DEFAULT_CLOSED'}
     bl_idname = "OBJECT_PT_piesetting"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_category = "Tool"
+    bl_category = "KSYN"
     
 
 

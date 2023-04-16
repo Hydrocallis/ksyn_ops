@@ -13,7 +13,7 @@ from bpy.types import (
 
 class PIE3D_OT_MaterialDelete(Operator):
     bl_idname = "object.material_delete_operator"
-    bl_label = "選択したオブジェクトのマテリアルを削除"
+    bl_label = "Delete Material"
 
     def execute(self, context):
 

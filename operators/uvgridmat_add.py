@@ -16,14 +16,14 @@ class UVGRIDMAT_ADD():
         self.matname = "UVGRID"
         self.active_obj = obj
         filepath = Path(__file__).parent
-        print("###filepath", filepath)
+        # print("###filepath", filepath)
         filepath /= '../tectures'
-        print("###filepath2", filepath)
+        # print("###filepath2", filepath)
         if props.uv_grid_material_image_bool == False:
             self.grid_tex_path = os.path.join(filepath, "uv_grid.png")
         else:
             self.grid_tex_path = os.path.join(filepath, "color_grid.png")
-        print('###',self.grid_tex_path)
+        # print('###',self.grid_tex_path)
 
 
     def material_nodes_set(self):
@@ -45,16 +45,14 @@ class UVGRIDMAT_ADD():
         grid_tex.image = bpy.data.images.load(self.grid_tex_path)
         grid_tex.image.colorspace_settings.name = "Non-Color"
         grid_tex.location = (-300, 300)
-        print('###0-0###', grid_tex)
+        # print('###0-0###', grid_tex)
 
        # Create the Texture mapping node
         tex_mapping = nodes.new("ShaderNodeMapping")
         tex_mapping.location = (-500, 300)
         tex_mapping.name = "cus-Mapping"
 
-        print('###',tex_mapping.inputs[3].default_value)
-
-
+        # print('###',tex_mapping.inputs[3].default_value)
 
         # Create the Texture Coordinate node
         tex_coordinate = nodes.new("ShaderNodeTexCoord")
@@ -69,6 +67,7 @@ class UVGRIDMAT_ADD():
 
         # Connect the displacement texture to the Displacement node
         links.new(bsdf.inputs["Base Color"], grid_tex.outputs["Color"])
+        self.grid_tex =grid_tex
         
         
         return (nodes, bsdf, grid_tex, tex_mapping, tex_coordinate, material, tex_mapping.inputs[3].default_value)
@@ -108,7 +107,7 @@ class UVGRIDMAT_ADD():
             self.active_obj.material_slots[0].material = material
         else:
             self.active_obj.data.materials.append(material)
-            print('###',material.name)
+            # print('###',material.name)
         return material.name
 
 
@@ -123,7 +122,7 @@ class UVGRIDMAT_ADD():
         return matbool
 
 
-    def girid_material_get(self,):
+    def girid_material_get(self,context):
         props = bpy.context.scene.myedit_property_group
 
         matbool = self.check_materialdata()
@@ -134,7 +133,7 @@ class UVGRIDMAT_ADD():
 
         elif props.uv_grid_material_duplicate_bool == True:
             mat = self.act_obj_addmat()
-            print('###0-1###', mat)
+            # print('###0-1###', mat)
             mat = bpy.data.materials.get(mat)
         elif matbool == True and props.uv_grid_material_duplicate_bool == False:
              mat = bpy.data.materials.get(self.matname)
@@ -143,6 +142,12 @@ class UVGRIDMAT_ADD():
             self.active_obj.material_slots[0].material = mat
         else:
             self.active_obj.data.materials.append(mat)
+        if context.space_data.shading.color_type != 'TEXTURE':
+            context.space_data.shading.color_type = 'TEXTURE'
+
+
+
+        
         
 class PIE3D_OT_UvGridMat(Operator):
     bl_idname = 'object.uvgridmat'
@@ -152,6 +157,6 @@ class PIE3D_OT_UvGridMat(Operator):
     def execute(self, context):
         for obj in bpy.context.selected_objects:
             uv = UVGRIDMAT_ADD(obj)
-            uv.girid_material_get()
+            uv.girid_material_get(context)
 
         return {'FINISHED'}

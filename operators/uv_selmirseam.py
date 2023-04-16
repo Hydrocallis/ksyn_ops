@@ -9,7 +9,7 @@ from bpy.types import (
         )
 
 
-class PIE3D_OT_uv_selmirseam(Operator):
+class MESHUV_OT_uvsettingselmirseam(Operator):
     bl_idname = 'object.uv_selmirseam'
     bl_label = 'uv_selmirseam'
     bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
