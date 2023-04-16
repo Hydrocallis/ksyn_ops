@@ -7,6 +7,7 @@ def get_translang(eng,trans):
     else:
          return eng
 
+
 def botom_right_draw(self):
 
 

@@ -179,7 +179,7 @@ display_type_items = [
     ("SINGLE_ARROW", "Single Arrow", "", 3),
     ("CIRCLE", "Circle", "", 4),
     ("CUBE", "Cube", "", 5),
-    ("SPHERE'", "Sphere", "", 6),
+    ("SPHERE", "Sphere", "", 6),
     ("CONE", "Cone", "", 7),
         ]
 
