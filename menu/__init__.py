@@ -12,6 +12,8 @@ if "bpy" in locals():
 		"top_left_draw",	
 		"top_right_draw",	
 		"bottom_draw",	
+		"bottom_left_draw",	
+		"right_draw",	
 		#メニュー
 		"pieviewmenu",	
 	

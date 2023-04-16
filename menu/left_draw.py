@@ -107,10 +107,9 @@ def left_draw(self):
     else:
 
         row.operator_menu_enum("object.modifier_add", "type")
-        row = box.row(align=True)
-        row.operator("object.pie8_operator")
-        row.operator("object.pie9_operator")
-        row.operator("object.pie11_operator")
+        # row = box.row(align=True)
+        # row.operator("object.pie8_operator")
+        # row.operator("object.pie9_operator")
         row = box.row(align=True)
         row.operator("object.meshmirror_operator")
         # 削除クリーンアップ関係

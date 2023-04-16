@@ -11,3 +11,4 @@ def top_left_draw(self):
 
     box.operator("wm.save_mainfile", text="Save", icon='FILE_TICK')
     box.operator("wm.save_as_mainfile", text="Save As...")
+    box.operator("object.pie11_operator")

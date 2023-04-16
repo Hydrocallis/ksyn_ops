@@ -8,12 +8,12 @@ bl_info = {
     "name": "KSYN OPS",
     "description": "Viewport custum",
     "author": "KSYN",
-    "version": (0, 1, 2),
+    "version": (0, 1, 3),
     "blender": (3, 2, 0),
     "location": "shift ctrl Q key",
     "warning": "",
     "doc_url": "",
-    "category": "KSYN"
+    "category": "KSYN",
     }
 
 
@@ -87,6 +87,8 @@ from bpy.types import (
 
         )
 
+
+from .utils.get_translang import get_translang
 class PIE3D_OT_PiePropsSetting(Operator):
         bl_idname = 'object.pie_props_setting'
         bl_label = 'piepropssetting'
@@ -259,6 +261,8 @@ class pie4(Operator):
 class pie8(Operator):
     bl_idname = "object.pie8_operator"
     bl_label = "X軸90回転"
+    bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
+
 
     def execute(self, context):
         obj = bpy.context.active_object
@@ -269,6 +273,8 @@ class pie8(Operator):
 class pie9(Operator):
     bl_idname = "object.pie9_operator"
     bl_label = "Y軸90回転"
+    bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
+
 
     def execute(self, context):
         obj = bpy.context.active_object
@@ -279,6 +285,8 @@ class pie9(Operator):
 class pie10(Operator):
     bl_idname = "object.pie10_operator"
     bl_label = "スムーズ"
+    bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
+
 
     def execute(self, context):
         bpy.ops.object.shade_smooth()
@@ -288,12 +296,16 @@ class pie10(Operator):
 
 class pie11(Operator):
     bl_idname = "object.pie11_operator"
-    bl_label = "Z軸90回転"
+    bl_label = get_translang("Setting","設定")
+    bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
+
 
     def execute(self, context):
-        obj = bpy.context.active_object
-        obj.matrix_world @= Matrix.Rotation(radians(90), 4, 'Z')
-        bpy.ops.object.transform_apply(location=False, rotation=True, scale=False)
+        # obj = bpy.context.active_object
+        bpy.ops.screen.userpref_show()
+        bpy.context.preferences.active_section = 'ADDONS'
+        bpy.data.window_managers["WinMan"].addon_search = sys.modules['ksyn_ops'].bl_info.get("name")
+        # print('###',sys.modules[__package__].bl_info.get("version", (-1,-1,-1)))
         return {'FINISHED'}
 
 class pie18(Operator):
@@ -379,17 +391,17 @@ class ExampleAddonPreferences(AddonPreferences):
         name="Example Number",
         default=4,
     )
-    boolean: BoolProperty(
-        name="Example Boolean",
+    adminmode: BoolProperty(
+        name="Admin Mode",
         default=False,
     )
 
     def draw(self, context):
         layout = self.layout
-        layout.label(text="This is a preferences view for our add-on")
-        layout.prop(self, "filepath")
-        layout.prop(self, "number")
-        layout.prop(self, "boolean")
+        # layout.label(text="This is a preferences view for our add-on")
+        # layout.prop(self, "filepath")
+        # layout.prop(self, "number")
+        layout.prop(self, "adminmode")
 
         import rna_keymap_ui 
         layout = self.layout

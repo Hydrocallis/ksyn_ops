@@ -56,7 +56,7 @@ class KSYN_OT_lastselectaddempty(bpy.types.Operator):
     name : StringProperty(default = "Empty")
     parent : BoolProperty(default = True)
     # single_arrows : BoolProperty(default = True)
-    display_items : EnumProperty(items=display_type_items, default="PLAIN_AXES")
+    display_items : EnumProperty(items=display_type_items, default="SINGLE_ARROW")
     parent_keep_transform : BoolProperty(default = True)
     emlocation : FloatVectorProperty(subtype="XYZ_LENGTH")
     display_size : FloatProperty(default= 1)
