@@ -125,6 +125,8 @@ def left_draw(self):
         row.label(text = "Boolean")
         row = box.row(align=True)
         row.operator("object.boolonoff_operator")
+        row = box.row(align=True)
+
         row.operator("object.selectobjectbool_operator").cmd = "simpleboolean"
         row.operator("object.selectobjectbool_operator",text=get_translang('Appy Boolean','ブーリアン適応')).cmd = "applyboolean"
 

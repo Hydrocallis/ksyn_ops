@@ -8,7 +8,7 @@ bl_info = {
     "name": "KSYN OPS",
     "description": "Viewport custum",
     "author": "KSYN",
-    "version": (0, 1, 4),
+    "version": (0, 1, 5),
     "blender": (3, 2, 0),
     "location": "shift ctrl Q key",
     "warning": "",
@@ -63,6 +63,7 @@ if "bpy" in locals():
     "operators",
     "menu",
 
+
     ]
 
     for module in reloadable_modules: # リスト内のものがすでにあれば、reloadを発動する
@@ -75,6 +76,7 @@ from . import operators
 from . import properties
 from . import panel
 from . import menu
+
 
 
 
@@ -471,6 +473,7 @@ def register():
     panel.register()
     menu.register()
     properties.register()
+
 
 
 

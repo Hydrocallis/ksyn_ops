@@ -40,6 +40,18 @@ if "bpy" in locals():
     "material_append",	
 
 
+ # ot
+    "edge_fr_vertex_op",
+    "easy_mirror",
+    "object_easy_array",
+    "easy_knife_project",
+    "easy_curve_to_mesh",
+    "ciercle_dupulicate_ot",
+    "wordlorijin_move_ot",
+    "curve_mirror_op",
+    "objectinstans",
+    "objectinstansmirror",
+
 	]
 	
 	for module in reloadable_modules:
@@ -78,6 +90,16 @@ from .meshbicect_mirror import MESH_OT_bicect_mirror
 from .meshbicect_mirror import MESH_OT_bicect_mirror
 from .material_append import MATERIAL_OT_matterialappend
 
+from .edge_fr_vertex_op import SIMPLE_OT_edgefrvertex
+from .object_easy_array import OBJECTEASYARRAY_OT_objarray
+from .easy_knife_project import SIMPLE_OT_easy_knife_project
+from .easy_curve_to_mesh import SIMPLE_OT_easy_curve_to_mesh
+from .ciercle_dupulicate_ot import SIMPLEARRAY_OP_ciercle_dupulicate
+from .wordlorijin_move_ot import WORDORIJINMOVE_OT_MAIN
+from .curve_mirror_op import SIMPLE_OT_curve_mirror
+from .easy_mirror import OBJECTEASYMIRROR_OT_MAIN
+from .objectinstans import PIE3D_OT_objectinstans
+from .objectinstansmirror import PIE3D_OT_objectinstansmirror
 
 
 
@@ -114,6 +136,18 @@ MESH_OT_simplerotate,
 MESH_OT_Meshmirror_operator,
 PIE3D_OT_originset,
 MATERIAL_OT_matterialappend,
+
+
+SIMPLE_OT_edgefrvertex,
+SIMPLEARRAY_OP_ciercle_dupulicate,
+OBJECTEASYARRAY_OT_objarray,
+SIMPLE_OT_easy_knife_project,
+SIMPLE_OT_easy_curve_to_mesh,
+WORDORIJINMOVE_OT_MAIN,
+SIMPLE_OT_curve_mirror,
+OBJECTEASYMIRROR_OT_MAIN,
+PIE3D_OT_objectinstans,
+PIE3D_OT_objectinstansmirror,
 
 )
 

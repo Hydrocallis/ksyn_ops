@@ -11,6 +11,7 @@ if "bpy" in locals():
 	reloadable_modules = [
 
     "pieeditpropertyGroup",
+    "propertyGroup"
 
 	]
 	for module in reloadable_modules:
@@ -20,12 +21,14 @@ if "bpy" in locals():
 
 
 
-from .pieeditpropertyGroup import *
+from .pieeditpropertyGroup import MyEDITPIEPropertyGroup
+from .propertyGroup import PropertyGroup as simple_object_PropertyGroup
 
 
 classes = (
 
 MyEDITPIEPropertyGroup,
+simple_object_PropertyGroup
 
 )
 
@@ -34,6 +37,7 @@ def register():
 		bpy.utils.register_class(cls)
 	
 	bpy.types.Scene.myedit_property_group = bpy.props.PointerProperty(type=MyEDITPIEPropertyGroup)
+	bpy.types.Scene.simple_object_propertygroup = bpy.props.PointerProperty(type=simple_object_PropertyGroup)
 
 
 
@@ -42,8 +46,8 @@ def unregister():
 		bpy.utils.unregister_class(cls)
 
 	del bpy.types.Scene.myedit_property_group
-
-
+	del bpy.types.Scene.simple_object_propertygroup
+	
 
 if __name__ == "__main__":
 	register()

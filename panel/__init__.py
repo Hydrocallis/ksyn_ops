@@ -6,6 +6,8 @@ if "bpy" in locals():
 	import importlib
 	reloadable_modules = [
     "pie_panel_setting",
+    "panel_simpleobject",
+
 
 	]
 	for module in reloadable_modules:
@@ -13,14 +15,16 @@ if "bpy" in locals():
 			importlib.reload(locals()[module])
 
 
-from .pie_panel_setting import PIE3D_PT_PIESETTING,PIE3D_PT_PIESETTINGARM
+from .pie_panel_setting import PIE3D_PT_PIESETTING1,PIE3D_PT_PIESETTING2,PIE3D_PT_PIESETTING3,SIMPLEOBJECT_PT_PANEL
+
 
 
 
 classes = (
-PIE3D_PT_PIESETTING,
-PIE3D_PT_PIESETTINGARM,
-
+PIE3D_PT_PIESETTING1,
+SIMPLEOBJECT_PT_PANEL,
+PIE3D_PT_PIESETTING2,
+PIE3D_PT_PIESETTING3,
 
 )
 

@@ -16,6 +16,8 @@ if "bpy" in locals():
 		"right_draw",	
 		#メニュー
 		"pieviewmenu",	
+    	"instansmenu",
+
 	
 
 
@@ -28,11 +30,15 @@ if "bpy" in locals():
 
 
 from .pieviewmenu import PIE_MT_ViewNumpad
+from .instansmenu import PIE_MT_InstansMenu,PIE_MT_InstansMenu2
 
 
 
 classes = (
 	PIE_MT_ViewNumpad,
+    PIE_MT_InstansMenu,
+    PIE_MT_InstansMenu2,
+
 		)
 
 

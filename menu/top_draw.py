@@ -29,19 +29,21 @@ def top_draw(self):
     addon_prefs = preferences.addons[__name__.split(".")[0]].preferences
 
     modeset(self,col)
-
-    col.scale_x = 0.5 # メニューの幅を半分に制限する
+    col.popover('OBJECT_PT_transform', icon='RIGHTARROW_THIN',  text='TRANSFORM')
 
     if addon_prefs.adminmode ==True:
-        col.popover("OBJECT_PT_piesetting_arm", text = "AMATURE", icon='ARMATURE_DATA')
+        col.scale_x = 0.5 # メニューの幅を半分に制限する
+        # col.popover("OBJECT_PT_piesetting_arm", text = "AMATURE", icon='ARMATURE_DATA')
         row = col.row(align=True)
-        row.popover('OBJECT_PT_transform', icon='RIGHTARROW_THIN',  text='TRANSFORM')
         row = col.row(align=True)
-        row.popover("OBJECT_PT_piesetting", icon='TRIA_UP')
-        row = col.row(align=True)
-        row.operator("object.uvgridmat", icon='EVENT_U')
+        row.popover("PIE3D_PT_PIESETTING", icon='TRIA_UP')
         # row = col.row(align=True)
-        # row.operator("object.subdivision_show", icon='TRIA_UP')
-        row = col.row(align=True)
-        row.operator("object.colorpickup_object", icon='EYEDROPPER',text="Obj Color")
+        # row.operator("object.uvgridmat", icon='EVENT_U')
+        # # row = col.row(align=True)
+        # # row.operator("object.subdivision_show", icon='TRIA_UP')
+        # row = col.row(align=True)
+        # row.operator("object.colorpickup_object", icon='EYEDROPPER',text="Obj Color")
+        # row = col.row(align=True)
+
+        # # row.menu("PIE_MT_InstansMenu2", icon='EYEDROPPER')
 

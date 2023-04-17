@@ -1,4 +1,4 @@
-import bpy
+import bpy,sys
 
 from bpy.types import (
         Menu,
@@ -7,17 +7,34 @@ from bpy.types import (
         PropertyGroup,
         )
 
-        
-class PIE3D_PT_PIESETTINGARM(Panel):
+from ..utils.get_translang import get_translang
+
+class PIE3D_PT_PIESETTINGARM_main:
     """Creates a Panel in the Object properties window"""
-    bl_label = "pie Setting Armture"
-    bl_idname = "OBJECT_PT_piesetting_arm"
     bl_options = {'DEFAULT_CLOSED'}
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = "KSYN"
     
+class PIE3D_PT_PIESETTING1(PIE3D_PT_PIESETTINGARM_main,Panel):
+    bl_label = get_translang("Pie Panel","パイパネル")
+    bl_idname = "PIE3D_PT_PIESETTING"
+        # アドオンのバージョンを取得する関数
+    def get_addon_version(self,addon_name):
+        return sys.modules[addon_name].bl_info.get("version", (-1,-1,-1))
 
+
+
+    def draw(self, context):
+         
+        addon_version = self.get_addon_version(__package__.split(".")[0])
+        self.layout.label(text=f"Addon Version: {addon_version[0]}.{addon_version[1]}.{addon_version[2]}")
+
+        pass
+
+class PIE3D_PT_PIESETTING2(PIE3D_PT_PIESETTINGARM_main,Panel):
+    bl_label = "pie Setting Armture"
+    bl_parent_id = "PIE3D_PT_PIESETTING"
 
     def draw(self, context):
         layout = self.layout
@@ -29,17 +46,10 @@ class PIE3D_PT_PIESETTINGARM(Panel):
         row = layout.row()
         row.operator("object.amaturerestbool")
 
-
-
-class PIE3D_PT_PIESETTING(Panel):
+class PIE3D_PT_PIESETTING3(PIE3D_PT_PIESETTINGARM_main,Panel):
     """Creates a Panel in the Object properties window"""
     bl_label = "pie Setting Colorpic"
-    bl_options = {'DEFAULT_CLOSED'}
-    bl_idname = "OBJECT_PT_piesetting"
-    bl_space_type = 'VIEW_3D'
-    bl_region_type = 'UI'
-    bl_category = "KSYN"
-    
+    bl_parent_id ="PIE3D_PT_PIESETTING"
 
 
     def draw(self, context):
@@ -80,6 +90,82 @@ class PIE3D_PT_PIESETTING(Panel):
                 row.label(text=sele_ob.name)
                 row = layout.row()
                 row.template_list("MESH_UL_uvmaps", "uvmaps", obj_data, "uv_layers", obj_data.uv_layers, "active_index", rows=2)
+
+
+class SIMPLEOBJECT_PT_PANEL(PIE3D_PT_PIESETTINGARM_main,Panel):
+    bl_label = "Simple Object"
+    # bl_idname = "SIMPLEOBJECT_PT_PANEL"
+    # bl_space_type = 'VIEW_3D'
+    # bl_region_type = 'UI'
+    # bl_category = "KSYN"
+    bl_parent_id = "PIE3D_PT_PIESETTING"
+
+   
+
+
+    def draw(self, context):
+
+        layout = self.layout
+        props = bpy.context.scene.simple_object_propertygroup
+
+        if bpy.context.mode == "EDIT_MESH":
+            if bpy.context.object != None and len (bpy.context.selected_objects) > 0 :
+                layout.operator("object.easy_knife_project",
+                text="Easy Knife Project"
+                )
+
+
+        if bpy.context.mode == "OBJECT":
+
+            if bpy.context.object != None:
+
+                objarraybox = layout.box()  
+                
+                objarraybox.operator(
+                    "object.obuect_easy_array",
+                    text="Object Easy Array"
+                    )
+
+                objarraybox.operator(
+                    "object.ciercle_dupulicate",
+                    text="Circle Dupulicate"
+                    )
+        
+        curvebox = layout.box()
+
+        if bpy.context.object != None and len (bpy.context.selected_objects) > 0 :
+            curvebox.operator(
+                "object.easy_curve_to_mesh",
+                text="Easy Curve To Mesh"
+                )
+            # curvebox.operator(
+            #     "object.edge_fr_vertex",
+            #     )
+
+            curvebox.operator(
+                "object.curve_mirror",
+                )
+                
+        curvebox.label(text="Curve object to change the shape of a curve")                                                                        
+        curvebox.prop(props, "target_curve",text="Target Curve")
+
+        # その他アシスト機能
+        otherbox = layout.box()
+        if bpy.context.mode == "OBJECT":
+            if bpy.context.object != None:
+                otherbox.operator(
+                    "object.wordlorijn_move",
+                    text="World Origin Move"
+                    )
+                
+                otherbox.operator(
+                    "object.object_easy_mirror",
+                    text="Easy Object Mirror"
+                    )
+                otherbox.menu('PIE_MT_InstansMenu', icon='RIGHTARROW_THIN', text = "オブジェクトコピー")
+                
+
+
 
 
 
