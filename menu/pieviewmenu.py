@@ -17,19 +17,22 @@ from .bottom_draw import bottom_draw
 from .bottom_left_draw import bottom_left_draw
 from .right_draw import right_draw
 
-
 def get_translang(eng,trans):
     prev = bpy.context.preferences.view
     if prev.language =='ja_JP' and prev.use_translate_interface == True:
         return trans
     else:
         return eng
+    
+def get_addon_version(addon_name):
+    return sys.modules[addon_name].bl_info.get("version", (-1,-1,-1))
 
 class PIE_MT_ViewNumpad(Menu):
-    bl_idname = "PIE_MT_viewnumpad_mypanel"
-    bl_label = "CUSYANG_Pie Views Menu_"
-    bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
+    addon_version = get_addon_version(__package__.split(".")[0])
 
+    bl_idname = "PIE_MT_viewnumpad_mypanel"
+    bl_label = f"KSYN OPS Pie Menu v{addon_version[0]}.{addon_version[1]}.{addon_version[2]}"
+    bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
  
     def draw(self, context):
         # 4 - LEFT
