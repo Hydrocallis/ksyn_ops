@@ -1,0 +1,52 @@
+<mxfile host="65bd71144e">
+    <diagram id="HogGkgqBRZiEzLw1DyA0" name="ページ1">
+        <mxGraphModel dx="630" dy="553" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="5" value="レジストレーションの構造" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="100" y="30" width="240" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="14" value="" style="group" vertex="1" connectable="0" parent="1">
+                    <mxGeometry x="10" y="110" width="950" height="380" as="geometry"/>
+                </mxCell>
+                <mxCell id="11" value="" style="group" vertex="1" connectable="0" parent="14">
+                    <mxGeometry x="31.41" width="918.59" height="365" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="オペレーターの場合" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="11">
+                    <mxGeometry x="66.58419007957085" width="199.75257023871254" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="10" value="" style="group" vertex="1" connectable="0" parent="11">
+                    <mxGeometry x="19.70281047832095" y="80" width="898.887189521679" height="285" as="geometry"/>
+                </mxCell>
+                <mxCell id="13" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="10">
+                    <mxGeometry x="-44.388836605574575" y="-35" width="943.2760261272537" height="320" as="geometry"/>
+                </mxCell>
+                <mxCell id="8" value="&lt;font face=&quot;Consolas, Courier New, monospace&quot; color=&quot;#dcdcaa&quot;&gt;&lt;span style=&quot;font-size: 14px; font-weight: 400;&quot;&gt;ksyn_ops\utils\registration.py&lt;/span&gt;&lt;/font&gt;" style="text;strokeColor=none;fillColor=none;html=1;fontSize=24;fontStyle=1;verticalAlign=middle;align=center;" vertex="1" parent="10">
+                    <mxGeometry x="443.89460053047236" width="110.97365013261809" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="15" value="" style="group" vertex="1" connectable="0" parent="10">
+                    <mxGeometry y="10" width="288.531490344807" height="165" as="geometry"/>
+                </mxCell>
+                <mxCell id="2" value="&lt;div style=&quot;color: rgb(212, 212, 212); background-color: rgb(30, 30, 30); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;&lt;span style=&quot;color: #dcdcaa;&quot;&gt;reload_unity_modules&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;background-color: rgb(30, 30, 30); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;&lt;font color=&quot;#dcdcaa&quot;&gt;内にて&lt;/font&gt;&lt;/div&gt;&lt;font face=&quot;Consolas, Courier New, monospace&quot; color=&quot;#dcdcaa&quot;&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;\utils\registration.py&lt;br&gt;のモジュール情報を読み込み。&lt;br&gt;&lt;br&gt;&lt;/span&gt;&lt;/font&gt;" style="whiteSpace=wrap;html=1;" vertex="1" parent="15">
+                    <mxGeometry y="45" width="288.531490344807" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="6" value="ksyn_ops\__init__.py" style="text;strokeColor=none;fillColor=none;html=1;fontSize=24;fontStyle=1;verticalAlign=middle;align=center;" vertex="1" parent="10">
+                    <mxGeometry x="78.88682506630904" y="10" width="110.97365013261809" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="18" value="" style="edgeStyle=none;html=1;" edge="1" parent="10" source="6" target="2">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" value="&lt;div style=&quot;color: rgb(212, 212, 212); background-color: rgb(30, 30, 30); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;&lt;/div&gt;&lt;div style=&quot;color: rgb(212, 212, 212); background-color: rgb(30, 30, 30); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;&lt;span style=&quot;color: #9cdcfe;&quot;&gt;modules&lt;/span&gt; = []の中には再読み込みされる情報とレジストレーションされるオペレーターが入っている。&lt;/div&gt;&lt;div style=&quot;color: rgb(212, 212, 212); background-color: rgb(30, 30, 30); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;1つ目の配列がフォルダ名【オペレーターやパネルなど】&lt;/div&gt;&lt;div style=&quot;color: rgb(212, 212, 212); background-color: rgb(30, 30, 30); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;2つ目の配列がファイル名&lt;/div&gt;&lt;div style=&quot;color: rgb(212, 212, 212); background-color: rgb(30, 30, 30); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;３つ目がファイル名に入ってるレジストレーション必要なクラス名（※レジストレーションされるもの意外は入れないくて良い）&lt;/div&gt;" style="whiteSpace=wrap;html=1;" vertex="1" parent="14">
+                    <mxGeometry x="350" y="130" width="573.06" height="210" as="geometry"/>
+                </mxCell>
+                <mxCell id="16" value="" style="edgeStyle=none;html=1;" edge="1" parent="14" source="8" target="7">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="17" value="" style="edgeStyle=none;html=1;" edge="1" parent="14" source="8" target="7">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

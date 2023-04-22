@@ -8,14 +8,13 @@ bl_info = {
     "name": "KSYN OPS",
     "description": "Viewport custum",
     "author": "KSYN",
-    "version": (0, 1, 5),
+    "version": (0, 1, 6),
     "blender": (3, 2, 0),
     "location": "shift ctrl Q key",
     "warning": "",
     "doc_url": "",
     "category": "KSYN",
     }
-
 
 
 
@@ -29,29 +28,38 @@ def reload_unity_modules(name):
     for module in utils_modules:
         impline = "from . utils import %s" % (module)
 
-        # print("###hydoro unity reloading one %s" % (".".join([name] + ['utils'] + [module])))
+        print("###hydoro unity reloading one %s" % (".".join([name] + ['utils'] + [module])))
 
         exec(impline)
         importlib.reload(eval(module))
 
-    modules = []
 
-    for path, module in modules:
+    ### Operatorリロード
+    from .utils.registration import modules
+    
+    for path, module,cls in modules:
         if path:
             impline = "from . %s import %s" % (".".join(path), module)
+            # print('###KSYN_OPS OPARATOER RELOAD FILE ',impline)
         else:
             impline = "from . import %s" % (module)
 
-        print("###hydoro unity reloading second %s" % (".".join([name] + path + [module])))
+        print("###KSYN_OPS OPARATOER RELOAD FILE %s" % (".".join([name] + path + [module])+str(cls)))
 
         exec(impline)
+        # print('###modules',module)
         importlib.reload(eval(module))
 
-if 'bpy' in locals():
-    reload_unity_modules(bl_info['name'])
-# リロードモジュール　終了
+def reload_unity_modules2(name):
+    import os
+    import importlib
+   
+    utils_modules = sorted([name[:-3] for name in os.listdir(os.path.join(__path__[0], "utils")) if name.endswith('.py')])
 
-
+    for module in utils_modules:
+        impline = "from . utils import %s" % (module)
+        exec(impline)
+        importlib.reload(eval(module))
 
 # UTILIS以外のモジュールを再読み込み
 if "bpy" in locals():
@@ -70,13 +78,22 @@ if "bpy" in locals():
         if module in locals():
             importlib.reload(locals()[module])
 
+if 'bpy' in locals():
+    reload_unity_modules(bl_info['name'])
+
+#　何故かユーリティーは二度読まないと行けない
+if 'bpy' in locals():
+    reload_unity_modules2(bl_info['name'])
+
+# リロードモジュール　終了
+
+
 import bpy, sys, os, subprocess
 
 from . import operators
 from . import properties
 from . import panel
 from . import menu
-
 
 
 
@@ -92,6 +109,9 @@ from bpy.types import (
 
 
 from .utils.get_translang import get_translang
+from .utils.registration import register_classes,unregister_classes
+
+
 class PIE3D_OT_PiePropsSetting(Operator):
         bl_idname = 'object.pie_props_setting'
         bl_label = 'piepropssetting'
@@ -251,7 +271,6 @@ class OBJECT_OT_wiredisplay(Operator):
 
         return {'FINISHED'}
 
-
 class pie4(Operator):
     bl_idname = "object.pie4_operator"
     bl_label = "選択面以外を非表示"
@@ -259,7 +278,6 @@ class pie4(Operator):
     def execute(self, context):
         bpy.ops.mesh.hide(unselected=True)
         return {'FINISHED'}
-
 
 class pie8(Operator):
     bl_idname = "object.pie8_operator"
@@ -285,32 +303,6 @@ class pie9(Operator):
         bpy.ops.object.transform_apply(location=False, rotation=True, scale=False)
         return {'FINISHED'}
 
-class pie10(Operator):
-    bl_idname = "object.pie10_operator"
-    bl_label = "スムーズ"
-    bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
-
-
-    def execute(self, context):
-        bpy.ops.object.shade_smooth()
-        bpy.context.object.data.use_auto_smooth = True
-
-        return {'FINISHED'}
-
-class pie11(Operator):
-    bl_idname = "object.pie11_operator"
-    bl_label = get_translang("Setting","設定")
-    bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
-
-
-    def execute(self, context):
-        # obj = bpy.context.active_object
-        bpy.ops.screen.userpref_show()
-        bpy.context.preferences.active_section = 'ADDONS'
-        bpy.data.window_managers["WinMan"].addon_search = sys.modules['ksyn_ops'].bl_info.get("name")
-        # print('###',sys.modules[__package__].bl_info.get("version", (-1,-1,-1)))
-        return {'FINISHED'}
-
 class pie18(Operator):
     bl_idname = "object.pie18_operator"
     bl_label = "フラット面を選択"
@@ -334,44 +326,6 @@ class pie20(Operator):
     def execute(self, context):
         bpy.ops.mesh.mark_seam(clear=False)
         return {'FINISHED'}
-
-
-# 廃止予定
-class pie22(Operator):
-    bl_idname = "object.pie22_operator"
-    bl_label = "言語の切り替え"# 言語の切り替え
-    bl_options = {'REGISTER', 'UNDO'}
-# 入力の数値を登録
-
-    # myCheckField: bpy.props.BoolProperty(
-    #     name="InterFac",
-    #     default=False
-    # )
-    # myCheckField2: bpy.props.BoolProperty(
-    #     name="ToolTips",
-    #     default=False
-    # )
-    
-# 実際の実行関数
-    def execute(self, context):
-        pass
-        # bpy.context.preferences.view.use_translate_interface = self.myCheckField
-        # bpy.context.preferences.view.use_translate_tooltips = self.myCheckField2
-        return {'FINISHED'}
-
-def draw(self, context, layout):
-    prefs = context.preferences
-    view = prefs.view
-
-    layout.prop(view, "language")
-
-    col = layout.column(heading="Affect")
-    col.active = (bpy.app.translations.locale != 'en_US')
-    col.prop(view, "use_translate_tooltips", text="Tooltips")
-    col.prop(view, "use_translate_interface", text="Interface")
-    col.prop(view, "use_translate_new_dataname", text="New Data")
-
-
 
 
 # アドオンの項目の設定項目
@@ -445,7 +399,6 @@ def GetTranslationDict():
 # 辞書登録関数　終わり
 
 
-
 # クラスの登録
 classes = (
             ExampleAddonPreferences,
@@ -457,12 +410,9 @@ classes = (
             pie4,
             pie8,
             pie9,
-            pie10,
-            pie11,
             pie18,
             pie19,
             pie20,
-            pie22,
             )
 
 def register():
@@ -473,6 +423,8 @@ def register():
     panel.register()
     menu.register()
     properties.register()
+    register_classes()
+
 
 
 
@@ -514,6 +466,7 @@ def unregister():
     panel.unregister()
     menu.unregister()
     properties.unregister()
+    unregister_classes()
 
 
     wm = bpy.context.window_manager

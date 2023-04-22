@@ -32,7 +32,7 @@ def bottom_left_draw(self):
     other_menu.prop(rd, "use_border", text="Border")
 
     # 言語の切り替え
-    other_menu.operator("object.pie22_operator")
+    # other_menu.operator("object.pie22_operator")
 
     prefs = bpy.context.preferences
     view = prefs.view
