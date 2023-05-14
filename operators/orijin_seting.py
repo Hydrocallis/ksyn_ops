@@ -9,13 +9,14 @@ from bpy.types import (
         )
 
 from ..utils.orijin_set import orijinset
+from ..utils.get_translang import get_translang
 
 
 
 class PIE3D_OT_originset(Operator):
     """Tooltip"""
     bl_idname = "object.originset_oparetor"
-    bl_label = "Select area set origin"
+    bl_label = get_translang('Select area Origin','選択を原点へ')
     bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
     bl_options = {'REGISTER', 'UNDO'}
 

@@ -7,28 +7,9 @@ def get_translang(eng,trans):
     else:
         return eng
     
-def left_draw(self):
-    layout = self.layout
-    pie = layout.menu_pie()
-
-    box = pie.split().column()
-    
-    # y軸方向に空間を開けるための空白を用意
-    separete = box.row(align=True)
-    separete.separator()
-    separete.scale_y = 5
-
-
-    row = box.row(align=True)
-    #エディットモードの場合はこれを表示する https://docs.blender.org/api/current/bpy.context.html#bpy.context.mode
-    #         タイプ
-    # ['EDIT_MESH'、 'EDIT_CURVE'、 'EDIT_SURFACE'、 'EDIT_TEXT'、 'EDIT_ARMATURE'、
-    #  'EDIT_METABALL'、 'EDIT_LATTICE'、 'POSE'、 'SCULPT'、 'PAINT_WEIGHT'、
-    #   'PAINT_VERTEX'、 'PAINT_TEXTURE'の列挙型、 'PARTICLE'、 'OBJECT'、
-    #    'PAINT_GPENCIL'、 'EDIT_GPENCIL'、 'SCULPT_GPENCIL'、 'WEIGHT_GPENCIL'、
-    #     'VERTEX_GPENCIL']、デフォルト 'EDIT_MESH'、（読み取り専用）
-    if bpy.context.mode == 'EDIT_MESH':
+def left_draw_edit_mode(row,box):
         
+
         row.label(text = "Slect Menu")
         row = box.row(align=True)
         row.operator("mesh.select_all", text="All").action = 'SELECT'
@@ -48,6 +29,7 @@ def left_draw(self):
         row.label(text = "Mesh deformation")
         row = box.row(align=True)
         row.operator("object.meshmirror_operator")
+        row = box.row(align=True)
         row.operator("object.simplerotate")
         row.operator("object.originset_oparetor")
         row = box.row(align=True)
@@ -100,9 +82,23 @@ def left_draw(self):
         # row.operator("object.pie7_operator")
         row = box.row(align=True)
 
+def left_draw(self):
+    layout = self.layout
+    layout.column()
+    
+    pie = layout.menu_pie()
+    box = pie.split().column()
+    # y軸方向に空間を開けるための空白を用意
+    separete = box.row(align=True)
+    separete.separator()
+    separete.scale_y = 5
+    separete
+    row = box.row(align=True)
 
-
-
+    #     'VERTEX_GPENCIL']、デフォルト 'EDIT_MESH'、（読み取り専用）
+    if bpy.context.mode == 'EDIT_MESH':
+        left_draw_edit_mode(row,box)
+      
     ### OBJECT MODE
     else:
 

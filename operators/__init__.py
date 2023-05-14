@@ -51,6 +51,7 @@ if "bpy" in locals():
     "curve_mirror_op",
     "objectinstans",
     "objectinstansmirror",
+    "orijin_seting"
 
 	]
 	

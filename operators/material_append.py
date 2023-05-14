@@ -27,6 +27,11 @@ from bpy.props import (
 p_file = pathlib.Path(__file__)
 
 filepath=  str(p_file.parents[1].joinpath("asset", 'asset_001.blend'))
+
+# make_enum_material_listで読み込みたいマテリアルリスト（それ以外は省く）
+desired_materials = ['Wood Carving Texture_v1_03', 'Edge detect', 'Brick Texture _v1.02']
+
+
 # filepath = r"D:\マイドライブ\blender scrpt\addons\pie_3d_menu\asset\asset_001.blend"
 #
 
@@ -57,6 +62,8 @@ def import_materials_from_file(filepath,matname):
     # インポートされたマテリアルを返す
 
     datalist = data_from.materials
+    # print('###',datalist)
+    datalistfilter = []
     if data_to.materials == []:
         material=None
     else:
@@ -180,19 +187,33 @@ def line_num():
 
     return script_name + " Line: " + str(current_line) + " Caller: " + caller_str
 
+def set_material_mode():
+    bpy.context.scene.render.engine = 'CYCLES'
+    for area in bpy.context.screen.areas:
+        if area.type == 'VIEW_3D':
+            for space in area.spaces:
+                if space.type == 'VIEW_3D':
+                    space.shading.type = 'RENDERED'
+
+
 def main(self):
     materials=check_matappend(self)
     material_option_cheker(self,materials)
     option_change(self,materials)
     uv_or_object_coordinate(self)
+    set_material_mode()
 
 def make_enum_material_list(scene, context):
-    material,datalist=import_materials_from_file(filepath,"")
-    matlist =[]
-    for index,mat in enumerate(datalist):
-        matname= remove_japanese(mat)
-        matlist.append((matname,matname,"",index))
+    material, datalist = import_materials_from_file(filepath, "")
+    matlist = []
+    for index, mat in enumerate(datalist):
+        matname = remove_japanese(mat)
+        if matname in desired_materials:
+            matlist.append((matname, matname, "", index))
     return matlist
+
+
+
 
 class options:
 

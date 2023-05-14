@@ -8,7 +8,7 @@ bl_info = {
     "name": "KSYN OPS",
     "description": "Viewport custum",
     "author": "KSYN",
-    "version": (0, 1, 6),
+    "version": (0, 1, 7),
     "blender": (3, 2, 0),
     "location": "shift ctrl Q key",
     "warning": "",
@@ -28,7 +28,7 @@ def reload_unity_modules(name):
     for module in utils_modules:
         impline = "from . utils import %s" % (module)
 
-        print("###hydoro unity reloading one %s" % (".".join([name] + ['utils'] + [module])))
+        # print("###KSYN_OPS UTILS RELOAD FILE %s" % (".".join([name] + ['utils'] + [module])))
 
         exec(impline)
         importlib.reload(eval(module))
@@ -44,16 +44,16 @@ def reload_unity_modules(name):
         else:
             impline = "from . import %s" % (module)
 
-        print("###KSYN_OPS OPARATOER RELOAD FILE %s" % (".".join([name] + path + [module])+str(cls)))
+        for c in cls:
+            # print("###KSYN_OPS OPARATOER RELOAD FILE %s" % (".".join([name] + path + [module])+str(c)))
+            pass
 
         exec(impline)
         # print('###modules',module)
         importlib.reload(eval(module))
 
-def reload_unity_modules2(name):
-    import os
-    import importlib
-   
+
+    # UTILIS以外のモジュールを再読み込み
     utils_modules = sorted([name[:-3] for name in os.listdir(os.path.join(__path__[0], "utils")) if name.endswith('.py')])
 
     for module in utils_modules:
@@ -71,7 +71,6 @@ if "bpy" in locals():
     "operators",
     "menu",
 
-
     ]
 
     for module in reloadable_modules: # リスト内のものがすでにあれば、reloadを発動する
@@ -80,10 +79,6 @@ if "bpy" in locals():
 
 if 'bpy' in locals():
     reload_unity_modules(bl_info['name'])
-
-#　何故かユーリティーは二度読まないと行けない
-if 'bpy' in locals():
-    reload_unity_modules2(bl_info['name'])
 
 # リロードモジュール　終了
 
@@ -97,8 +92,6 @@ from . import menu
 
 
 
-from math import radians
-from mathutils import Matrix
 from bpy.types import (
         Menu,
         Operator,
@@ -271,63 +264,6 @@ class OBJECT_OT_wiredisplay(Operator):
 
         return {'FINISHED'}
 
-class pie4(Operator):
-    bl_idname = "object.pie4_operator"
-    bl_label = "選択面以外を非表示"
-
-    def execute(self, context):
-        bpy.ops.mesh.hide(unselected=True)
-        return {'FINISHED'}
-
-class pie8(Operator):
-    bl_idname = "object.pie8_operator"
-    bl_label = "X軸90回転"
-    bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
-
-
-    def execute(self, context):
-        obj = bpy.context.active_object
-        obj.matrix_world @= Matrix.Rotation(radians(90), 4, 'X')
-        bpy.ops.object.transform_apply(location=False, rotation=True, scale=False)
-        return {'FINISHED'}
-
-class pie9(Operator):
-    bl_idname = "object.pie9_operator"
-    bl_label = "Y軸90回転"
-    bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
-
-
-    def execute(self, context):
-        obj = bpy.context.active_object
-        obj.matrix_world @= Matrix.Rotation(radians(90), 4, 'Y')
-        bpy.ops.object.transform_apply(location=False, rotation=True, scale=False)
-        return {'FINISHED'}
-
-class pie18(Operator):
-    bl_idname = "object.pie18_operator"
-    bl_label = "フラット面を選択"
-
-    def execute(self, context):
-        bpy.ops.mesh.faces_select_linked_flat()
-        return {'FINISHED'}
-
-class pie19(Operator):
-    bl_idname = "object.pie19_operator"
-    bl_label = "シームをクリア"
-
-    def execute(self, context):
-        bpy.ops.mesh.mark_seam(clear=True)
-        return {'FINISHED'}
-
-class pie20(Operator):
-    bl_idname = "object.pie20_operator"
-    bl_label = "シームをつける"
-
-    def execute(self, context):
-        bpy.ops.mesh.mark_seam(clear=False)
-        return {'FINISHED'}
-
-
 # アドオンの項目の設定項目
 from bpy.types import Operator, AddonPreferences
 from bpy.props import StringProperty, IntProperty, BoolProperty
@@ -407,13 +343,8 @@ classes = (
             PIE3D_OT_SubdivisionShow,
             PIE3D_OT_AmatureRestBool,
             OBJECT_OT_wiredisplay,
-            pie4,
-            pie8,
-            pie9,
-            pie18,
-            pie19,
-            pie20,
             )
+
 
 def register():
     for cls in classes:
