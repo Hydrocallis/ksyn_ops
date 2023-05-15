@@ -11,7 +11,7 @@ from bpy.types import (
 
 
 
-class PIE3D_OT_MaterialDelete(Operator):
+class MaterialDelete(Operator):
     bl_idname = "object.material_delete_operator"
     bl_label = "Delete Material"
 

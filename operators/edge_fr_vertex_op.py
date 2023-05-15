@@ -43,7 +43,7 @@ def getselevertex_makeedge():
         j.select =True
         
 
-class SIMPLE_OT_edgefrvertex(bpy.types.Operator):
+class edgefrvertex(bpy.types.Operator):
     bl_idname = 'object.edge_fr_vertex'
     bl_label = 'Edge from Vertex'
     bl_description = f' CLASS_NAME_IS={sys._getframe().f_code.co_name}/n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n '

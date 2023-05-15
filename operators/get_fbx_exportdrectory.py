@@ -6,7 +6,7 @@ from bpy.types import (
         PropertyGroup,
 
         )
-class PIE3D_OT_GetFbxInformation(Operator):
+class GetFbxInformation(Operator):
         bl_idname = 'object.getfbxinformation'
         bl_label = 'getfbxinformation'
         # 自身のクラスの呼び出しにはSYSモジュールが必要

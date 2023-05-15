@@ -20,7 +20,7 @@ def ShowMessageBox(message = "", message2="", title = "Message Box", icon = 'INF
 
 # sample
 
-class PIE3D_OT_mesh_emptyverdel(Operator):
+class mesh_emptyverdel(Operator):
     bl_idname = 'object.mesh_emptyverdel'
     bl_label = 'Mesh Empty Delete'
     bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "

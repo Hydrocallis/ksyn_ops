@@ -119,7 +119,7 @@ def main(self):
         change_matuvscale(self)
 
 
-class MESHUV_OT_uvsetting(Operator):
+class uvsetting(Operator):
     bl_idname = 'object.uv_setting'
     bl_label = 'Mesh UV Setting'
     bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "

@@ -135,7 +135,7 @@ def main(self):
 
 
 
-class MESH_OT_Meshmirror_operator(bpy.types.Operator):
+class Meshmirror_operator(bpy.types.Operator):
     bl_idname = "object.meshmirror_operator"
     bl_label = "Mesh Mirror"
 

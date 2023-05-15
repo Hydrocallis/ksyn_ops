@@ -9,7 +9,7 @@ from bpy.types import (
         )
 
 
-class PIE3D_OT_uv_Unwrap(Operator):
+class uv_Unwrap(Operator):
     bl_idname = 'object.uv_unwrap'
     bl_label = 'uv_unwrap'
     bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "

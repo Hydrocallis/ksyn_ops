@@ -33,7 +33,7 @@ def mesh_eval_to_mesh(context, obj):
     return new_obj
 
 
-class PIE3D_OT_objectinstans(Operator):
+class objectinstans(Operator):
         bl_idname = 'object.objectinstans_operator'
         bl_label = 'objectinstans_operator'
         # 自身のクラスの呼び出しにはSYSモジュールが必要

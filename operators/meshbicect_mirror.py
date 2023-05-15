@@ -79,7 +79,7 @@ def mirror(self, context):
        
 
 
-class MESH_OT_bicect_mirror(bpy.types.Operator):
+class bicect_mirror(bpy.types.Operator):
     bl_idname = 'mesh.mesh_ot_bicect_mirror'
     bl_label = get_translang('Mesh bicect mirror','二等分ミラー')
     bl_description = f' CLASS_NAME_IS={sys._getframe().f_code.co_name}/n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n ' 

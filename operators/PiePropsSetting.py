@@ -10,7 +10,7 @@ from bpy.types import (
 
 
 
-class PIE3D_OT_PiePropsSetting(Operator):
+class PiePropsSetting(Operator):
         bl_idname = 'object.pie_props_setting'
         bl_label = 'piepropssetting'
         # 自身のクラスの呼び出しにはSYSモジュールが必要

@@ -134,7 +134,7 @@ def rename(newnamelist):
         i.name =j
                 
 
-class OBJECTEASYARRAY_OT_objarray(bpy.types.Operator):
+class objarray(bpy.types.Operator):
     bl_idname = 'object.obuect_easy_array'
     bl_label = 'SimpleArray'
     bl_description = f' CLASS_NAME_IS={sys._getframe().f_code.co_name}/n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n '

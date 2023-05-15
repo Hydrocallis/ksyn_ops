@@ -18,7 +18,7 @@ from bpy.props import (
                         StringProperty
                         )
 
-class PIE3D_OT_ViewShading(Operator):
+class ViewShading(Operator):
     bl_idname = "object.viewshading"
     bl_label = "スタジのの表示設定"
     bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "

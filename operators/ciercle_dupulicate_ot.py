@@ -101,7 +101,7 @@ def main(self):
         )
 
 
-class SIMPLEARRAY_OP_ciercle_dupulicate(bpy.types.Operator):
+class ciercle_dupulicate(bpy.types.Operator):
     bl_idname = 'object.ciercle_dupulicate'
     bl_label = 'circle dupulicate'
     bl_description = f' CLASS_NAME_IS={sys._getframe().f_code.co_name}/n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n '

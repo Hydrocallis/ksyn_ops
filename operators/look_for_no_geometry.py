@@ -10,7 +10,7 @@ from bpy.types import (
 
 
 
-class PIE3D_OT_look_for_no_geometry(Operator):
+class look_for_no_geometry(Operator):
         bl_idname = 'object.look_for_no_geometry_operator'
         bl_label = 'Get empty geometry'
         # 自身のクラスの呼び出しにはSYSモジュールが必要

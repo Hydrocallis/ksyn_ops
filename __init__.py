@@ -19,7 +19,7 @@ bl_info = {
 
 
 # リロードモジュール　開始
-def reload_unity_modules(name):
+def reload_unity_modules(name,debug=False):
     import os
     import importlib
    
@@ -27,25 +27,25 @@ def reload_unity_modules(name):
 
     for module in utils_modules:
         impline = "from . utils import %s" % (module)
-
-        # print("###KSYN_OPS UTILS RELOAD FILE %s" % (".".join([name] + ['utils'] + [module])))
+        if debug == True:
+            print("##UTILS RELOAD %s" % (".".join([name] + ['utils'] + [module])))
 
         exec(impline)
         importlib.reload(eval(module))
 
 
     ### Operatorリロード
-    from .utils.registration import modules
+    from .registration import class_paths
     
-    for path, module,cls in modules:
+    for path, module,cls in class_paths:
         if path:
-            impline = "from . %s import %s" % (".".join(path), module)
+            impline = "from . %s import %s" % (".".join([path]), module)
             # print('###KSYN_OPS OPARATOER RELOAD FILE ',impline)
         else:
             impline = "from . import %s" % (module)
 
-        for c in cls:
-            # print("###KSYN_OPS OPARATOER RELOAD FILE %s" % (".".join([name] + path + [module])+str(c)))
+        if debug == True:
+            print("###OPARATOER RELOAD  %s" % (".".join([name + path + module+str(cls)])))
             pass
 
         exec(impline)
@@ -53,13 +53,15 @@ def reload_unity_modules(name):
         importlib.reload(eval(module))
 
 
-    # UTILIS以外のモジュールを再読み込み
+
+    # UTILIS以外のモジュールを再読み込み(これによって相互的にモジュール互換のあるものの問題を解消する)
     utils_modules = sorted([name[:-3] for name in os.listdir(os.path.join(__path__[0], "utils")) if name.endswith('.py')])
 
     for module in utils_modules:
         impline = "from . utils import %s" % (module)
         exec(impline)
         importlib.reload(eval(module))
+
 
 # UTILIS以外のモジュールを再読み込み
 if "bpy" in locals():
@@ -68,8 +70,8 @@ if "bpy" in locals():
     # フォルダを再登録
     "panel",
     "properties",
-    "operators",
     "menu",
+    "registration",
 
     ]
 
@@ -85,7 +87,6 @@ if 'bpy' in locals():
 
 import bpy, sys, os, subprocess
 
-from . import operators
 from . import properties
 from . import panel
 from . import menu
@@ -102,167 +103,8 @@ from bpy.types import (
 
 
 from .utils.get_translang import get_translang
-from .utils.registration import register_classes,unregister_classes
+from .registration import register_classes,unregister_classes
 
-
-class PIE3D_OT_PiePropsSetting(Operator):
-        bl_idname = 'object.pie_props_setting'
-        bl_label = 'piepropssetting'
-        # 自身のクラスの呼び出しにはSYSモジュールが必要
-        bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
-        
-        
-        def execute(self, context):
-            return context.window_manager.invoke_popup(self)
-
-
-        def draw(self, context):
-            layout = self.layout
-            props = context.scene.myedit_property_group
-
-            row = layout.row()
-            row.prop(props, "edit_int")
-            row = layout.row()
-            row.prop(props, "color_pic")
-            row = layout.row()
-            row.prop(props, "target_armature")
-            row = layout.row()
-            row.operator("object.amaturerestbool")
-            row = layout.row()
-            row.prop(props, "workspace_path")
-            row = layout.row()
-            row.prop(props, "fbx_selectbool")
-            row = layout.row()
-            row.prop(props, "fbx_act_collection_bool")
-            row = layout.row()
-            row.operator("object.fbxexortsupport")
-            row = layout.row()
-
-class PIE3D_OT_ColorPickupObject(Operator):
-    """Tooltip"""
-    bl_idname = "object.colorpickup_object"
-    bl_label = "ColorPickupObject"
-
-  
-    def execute(self, context):
-        for obj in bpy.context.selected_objects:
-            obj_color = context.scene.myedit_property_group.color_pic
-            obj.color = obj_color
-
-            
-        return {'FINISHED'}
-
-class PIE3D_OT_SubdivisionShow(Operator):
-    """Tooltip"""
-    bl_idname = "object.subdivision_show"
-    bl_label = "subdivision_show"
-
-    @classmethod
-    def poll(cls, context):
-        sub_mod = False
-        for mod in bpy.context.object.modifiers:
-            if mod.name == "Subdivision":
-                sub_mod = True
-                # print(sub_mod)
-            else:
-                pass
-        return sub_mod
-   
-    def execute(self, context):
-        if context.object.modifiers["Subdivision"].show_on_cage == False:
-            context.object.modifiers["Subdivision"].show_on_cage = True
-        
-        elif context.object.modifiers["Subdivision"].show_on_cage == True:
-            context.object.modifiers["Subdivision"].show_on_cage = False
-            
-        return {'FINISHED'}
-
-class PIE3D_OT_AmatureRestBool(Operator):
-    """Tooltip"""
-    bl_idname = "object.amaturerestbool"
-    bl_label = "amaturerestbool"
-
-    @classmethod
-    def poll(cls, context):
-        props = context.scene.myedit_property_group
-        return props.target_armature is not None
-   
-
-    def execute(self, context):
-        props = context.scene.myedit_property_group
-        print('###',props.target_armature)
-        print('###',props.target_armature.name)
-        amaturtur = props.target_armature
-        print('###',amaturtur.data.pose_position)
-        amr_pose = amaturtur.data.pose_position
-
-        if amr_pose == "POSE":
-            bpy.data.armatures[amaturtur.name].pose_position = "REST"
-        
-        elif amr_pose == "REST":
-            bpy.data.armatures[amaturtur.name].pose_position = "POSE"
-
-     
-            
-        return {'FINISHED'}
-# Lock Camera Transforms
-class PIE_OT_LockTransforms(Operator):
-    bl_idname = "object.locktransforms"
-    bl_label = "Lock Object Transforms"
-    bl_description = ("Enable or disable the editing of objects transforms in the 3D View\n"
-                     "Needs an existing Active Object")
-    bl_options = {'REGISTER', 'UNDO'}
-
-    @classmethod
-    def poll(cls, context):
-        return context.active_object is not None
-
-    def execute(self, context):
-        obj = context.active_object
-        if obj.lock_rotation[0] is False:
-            obj.lock_rotation[0] = True
-            obj.lock_rotation[1] = True
-            obj.lock_rotation[2] = True
-            obj.lock_scale[0] = True
-            obj.lock_scale[1] = True
-            obj.lock_scale[2] = True
-
-        elif context.object.lock_rotation[0] is True:
-            obj.lock_rotation[0] = False
-            obj.lock_rotation[1] = False
-            obj.lock_rotation[2] = False
-            obj.lock_scale[0] = False
-            obj.lock_scale[1] = False
-            obj.lock_scale[2] = False
-
-        return {'FINISHED'}
-
-class OBJECT_OT_wiredisplay(Operator):
-    bl_idname = "object.wiredisplay_operator"
-    bl_label = "オブジェクトにワイヤー表示"
-    bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
-
-
-    def execute(self, context):
-        ob = bpy.context.object
-        # 選択したオブジェクト
-        # https://blenderartists.org/t/first-python-coding-toggle-wire-display-for-entire-scene/634793
-
-        obs = bpy.context.selected_objects
-
-        if ob is None:
-            for o in obs:
-                if o.type == 'MESH':
-                    ob = o
-                    break
-
-        if ob is not None:
-            show_wire = not ob.show_wire
-            for ob in obs:
-                if ob.type == 'MESH':
-                    ob.show_wire = show_wire
-
-        return {'FINISHED'}
 
 # アドオンの項目の設定項目
 from bpy.types import Operator, AddonPreferences
@@ -321,6 +163,7 @@ class ExampleAddonPreferences(AddonPreferences):
 
 # 辞書登録関数　開始
 import os,codecs,csv
+
 def GetTranslationDict():
     dict = {}
     # 直下に置かれているcsvファイルのパスを代入
@@ -338,11 +181,6 @@ def GetTranslationDict():
 # クラスの登録
 classes = (
             ExampleAddonPreferences,
-            PIE_OT_LockTransforms,
-            PIE3D_OT_ColorPickupObject,
-            PIE3D_OT_SubdivisionShow,
-            PIE3D_OT_AmatureRestBool,
-            OBJECT_OT_wiredisplay,
             )
 
 
@@ -350,12 +188,10 @@ def register():
     for cls in classes:
         bpy.utils.register_class(cls)
 
-    operators.register()
     panel.register()
     menu.register()
     properties.register()
     register_classes()
-
 
 
 
@@ -393,7 +229,6 @@ def unregister():
     for cls in classes:
         bpy.utils.unregister_class(cls)
 
-    operators.unregister()
     panel.unregister()
     menu.unregister()
     properties.unregister()

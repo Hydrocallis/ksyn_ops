@@ -114,7 +114,7 @@ def main(self,context,):
 
 
 
-class OBJECTEASYMIRROR_OT_MAIN(bpy.types.Operator):
+class OBJECTEASYMIRROR(bpy.types.Operator):
     bl_idname = 'object.object_easy_mirror'
     bl_label = 'Easy Object Mirror'
     bl_description = f' CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n '

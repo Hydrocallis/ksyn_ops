@@ -7,7 +7,7 @@ from bpy.props import FloatVectorProperty
 from bpy.props import FloatProperty
 from bpy.props import EnumProperty
 import bpy
-from ..utils.get_translang import get_translang
+from ksyn_ops.utils.get_translang import get_translang
 
 import bpy
 import mathutils
@@ -191,7 +191,7 @@ bottom_types = [
 
         ]
 
-class KSYN_OT_lastselectaddempty(bpy.types.Operator):
+class lastselectaddempty(bpy.types.Operator):
     """Tooltip"""
     bl_idname = "object.lastselectaddempty"
     bl_label = "Last select add empty"

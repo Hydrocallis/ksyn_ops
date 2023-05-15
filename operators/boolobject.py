@@ -18,7 +18,7 @@ from bpy.props import (
                         StringProperty
                         )
 
-class PIE3D_OT_BoolOnOff(Operator):
+class BoolOnOff(Operator):
     bl_idname = "object.boolonoff_operator"
     bl_label = "ブール用ワイヤーON/OFF"
     bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
@@ -192,7 +192,7 @@ def main(self, selected_mulch_bool, parent_bool):
         selected_single_bool(self, obs,activeob)
 
 
-class PIE3D_OT_SelectObjectBool(Operator):
+class SelectObjectBool(Operator):
     bl_idname = "object.selectobjectbool_operator"
     bl_label = "Simple Boolean"
     bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "

@@ -8,12 +8,12 @@ from bpy.types import (
         PropertyGroup,
         )
 
-from ..utils.orijin_set import orijinset
-from ..utils.get_translang import get_translang
+from ksyn_ops.utils.orijin_set import orijinset
+from ksyn_ops.utils.get_translang import get_translang
 
 
 
-class PIE3D_OT_originset(Operator):
+class originset(Operator):
     """Tooltip"""
     bl_idname = "object.originset_oparetor"
     bl_label = get_translang('Select area Origin','選択を原点へ')

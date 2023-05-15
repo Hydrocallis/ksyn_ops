@@ -9,7 +9,7 @@ from bpy.types import (
         PropertyGroup,
 
         )
-from ..utils.englishname_trans import remove_japanese
+from ksyn_ops.utils.englishname_trans import remove_japanese
 
 from bpy.props import (
                         StringProperty, 
@@ -253,7 +253,7 @@ class options:
                                     subtype='XYZ'
                                     )
 
-class MATERIAL_OT_matterialappend(Operator,options):
+class matterialappend(Operator,options):
     bl_idname = "object.material_append"
     bl_label = get_translang("Material Append","マテリアル適応")
     bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "

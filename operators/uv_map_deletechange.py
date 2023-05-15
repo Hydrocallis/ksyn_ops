@@ -9,7 +9,7 @@ from bpy.types import (
         PropertyGroup,
         )
 
-class PIE3D_OT_UvMapDeleteChange(Operator):
+class UvMapDeleteChange(Operator):
     bl_idname = 'object.uv_map_delete_change'
     bl_label = 'uv_map_delete_change'
     bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "

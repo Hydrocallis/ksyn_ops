@@ -18,7 +18,7 @@ from bpy.props import (
                         StringProperty
                         )
 
-class PIE3D_OT_CopyAsset(Operator):
+class CopyAsset(Operator):
     bl_idname = "object.copyasset_operator"
     bl_label = "人ものさし"
     bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "

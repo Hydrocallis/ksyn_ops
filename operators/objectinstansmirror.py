@@ -7,7 +7,7 @@ from bpy.types import (
 
         )
 
-class PIE3D_OT_objectinstansmirror(Operator):
+class objectinstansmirror(Operator):
         bl_idname = 'object.objectinstansmirror_operator'
         bl_label = 'objectinstansmirror_operator'
         # 自身のクラスの呼び出しにはSYSモジュールが必要

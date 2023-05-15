@@ -212,7 +212,7 @@ def knife_cut(
     return bool
 
 
-class SIMPLE_OT_easy_knife_project(bpy.types.Operator):
+class easy_knife_project(bpy.types.Operator):
     bl_idname = 'object.easy_knife_project'
     bl_label = 'EasyKnifeProject'
     bl_description = f' CLASS_NAME_IS={sys._getframe().f_code.co_name}/n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n '

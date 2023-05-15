@@ -21,7 +21,7 @@ def main(self, context):
         )
 
 
-class MESH_OT_simplerotate(bpy.types.Operator):
+class simplerotate(bpy.types.Operator):
     bl_idname = 'object.simplerotate'
     bl_label = 'Simple Rotate'
     bl_description = f' CLASS_NAME_IS={sys._getframe().f_code.co_name}/n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n ' 

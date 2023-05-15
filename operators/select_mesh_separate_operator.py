@@ -8,7 +8,7 @@ from bpy.types import (
         )
 
 
-class MESH_OT_select_mesh_separate_operator(Operator):
+class select_mesh_separate_operator(Operator):
     bl_idname = "object.select_mesh_separate_operator"
     bl_label = "Mesh Separate"
     bl_options = {'REGISTER', 'UNDO'}

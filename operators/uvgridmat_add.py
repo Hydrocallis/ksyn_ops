@@ -9,7 +9,7 @@ from bpy.types import (
         PropertyGroup,
         )
 
-class UVGRIDMAT_ADD():
+class UVGRIDMATAdd():
     
     def __init__(self,obj):
         props = bpy.context.scene.myedit_property_group
@@ -149,14 +149,14 @@ class UVGRIDMAT_ADD():
 
         
         
-class PIE3D_OT_UvGridMat(Operator):
+class UvGridMat(Operator):
     bl_idname = 'object.uvgridmat'
     bl_label = 'uvgridmat'
     bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
 
     def execute(self, context):
         for obj in bpy.context.selected_objects:
-            uv = UVGRIDMAT_ADD(obj)
+            uv = UVGRIDMATAdd(obj)
             uv.girid_material_get(context)
 
         return {'FINISHED'}

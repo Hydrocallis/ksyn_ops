@@ -106,7 +106,7 @@ class WORLDORIJINMOVE:
             self.set_wordorijin_z(obj, axis,plusloc)
 
 
-class WORDORIJINMOVE_OT_MAIN(WORLDORIJINMOVE,bpy.types.Operator):
+class WORDORIJINMOVE(WORLDORIJINMOVE,bpy.types.Operator):
     bl_idname = 'object.wordlorijn_move'
     bl_label = 'world orijn_move'
     bl_description = f' CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n '

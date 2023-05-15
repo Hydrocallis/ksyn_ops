@@ -9,7 +9,7 @@ from bpy.types import (
         )
 
 
-class PIE3D_OT_weightpaint_value_chnage(Operator):
+class weightpaint_value_chnage(Operator):
     """Tooltip"""
     bl_idname = "object.weightpaint_value_chnage"
     bl_label = "Weightpaint value change"

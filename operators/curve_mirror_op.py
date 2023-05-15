@@ -22,7 +22,7 @@ def curve_mirror(
 
     bpy.ops.object.mode_set(mode='EDIT')
 
-class SIMPLE_OT_curve_mirror(bpy.types.Operator):
+class CurveMirror(bpy.types.Operator):
     bl_idname = 'object.curve_mirror'
     bl_label = 'Curve Mirror'
     bl_description = f' CLASS_NAME_IS={sys._getframe().f_code.co_name}/n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n '

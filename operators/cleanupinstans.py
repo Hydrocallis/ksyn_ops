@@ -6,7 +6,7 @@ from bpy.types import (
         PropertyGroup,
 
         )
-class PIE3D_OT_cleanupinstans(Operator):
+class cleanupinstans(Operator):
         bl_idname = 'object.cleanupinstans_operator'
         bl_label = 'cleanupinstans_operator'
         # 自身のクラスの呼び出しにはSYSモジュールが必要
