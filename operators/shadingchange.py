@@ -74,7 +74,7 @@ class ViewShading(Operator):
 
 
 
-class PIE3D_OT_ViewShadingShowFace(Operator):
+class ViewShadingShowFace(Operator):
     """Tooltip"""
     bl_idname = "object.viewshadingshowface_operator"
     bl_label = "フェイスの裏表切り替え"
