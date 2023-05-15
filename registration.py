@@ -5,13 +5,9 @@ import sys
 from bpy.utils import register_class, unregister_class
 
 
-import bpy
-import importlib.util
-import os
-
-
 # 親ディレクトリのパスを取得
 addon_path = os.path.dirname(os.path.realpath(__file__))
+addon_keymapscuspie = []
 
 class_paths = [
     ("operators", "pie_op", "AutoSommth"),
@@ -61,10 +57,11 @@ class_paths = [
     ("operators", "uvgridmat_add", "UvGridMat"),
     ("operators", "weightpaint_value_change", "weightpaint_value_chnage"),
     ("operators", "wordlorijin_move_ot", "WORDORIJINMOVE"),
+    ("ohters", "preference", "ExampleAddonPreferences"),
 ]
 
-KSYNOPS_OT_classes = []
 prefix = "KSYNOPS_OT_"
+prefix_ohters = "KSYNOPS_OH_"
 
 def load_classes(class_paths):
     classes = []
@@ -76,12 +73,11 @@ def load_classes(class_paths):
         spec.loader.exec_module(module)
 
         cls = getattr(module, class_name)
-        classes.append(cls)
+        classes.append((cls,classmodule,path_parts))
 
     return classes
 
 loaded_classes = load_classes(class_paths)
-classes = loaded_classes
 
 
 __subclasses__debug= False
@@ -100,9 +96,14 @@ def add_prefix(cls, prefix):
     new_cls = type(prefix + cls.__name__, cls.__bases__, dict(cls.__dict__))
     return new_cls
 
-for cls in classes:
-    new_cls = add_prefix(cls, prefix)
-    KSYNOPS_OT_classes.append(new_cls)
+loaded_classes_prefix=[]
+for cls,classmodule,part in loaded_classes:
+    if part =="operators":
+        new_cls = add_prefix(cls, prefix)
+    elif part =="ohters":
+        new_cls = add_prefix(cls, prefix_ohters)
+    loaded_classes_prefix.append((new_cls,classmodule,part))
+
 
 # クラス名を変えた場合はブレンダーを再起動する必要があるみたい。
 # 一見、再読み込みで元のクラス名が読み込まれそうだが、あくまでもレジストレーションのクラス名が読み込まれるので、
@@ -112,15 +113,15 @@ for cls in classes:
 register_debug=True
 
 def register_classes():
-    for c in KSYNOPS_OT_classes:
+    for cls,classmodule,part in loaded_classes_prefix:
         if register_debug:
-            print("REGISTERING", c)
-        register_class(c)
+            print(f"REGISTERING {part} {classmodule}", cls)
+        register_class(cls)
 
 
 def unregister_classes():
-    for c in KSYNOPS_OT_classes:
+    for cls,classmodule,part in loaded_classes_prefix:
         if register_debug:
-            print("UN-REGISTERING", c)
+            print(f"UN-REGISTERING {part} {classmodule}", cls)
 
-        unregister_class(c)
+        unregister_class(cls)
