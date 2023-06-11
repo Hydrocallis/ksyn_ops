@@ -57,6 +57,7 @@ class_paths = [
     ("operators", "uvgridmat_add", "UvGridMat"),
     ("operators", "weightpaint_value_change", "weightpaint_value_chnage"),
     ("operators", "wordlorijin_move_ot", "WORDORIJINMOVE"),
+    ("operators", "ConvertNgonsToTris", "ConvertNgonsToTrisOperator"),
     ("ohters", "preference", "ExampleAddonPreferences"),
 ]
 
@@ -110,7 +111,7 @@ for cls,classmodule,part in loaded_classes:
 # レジストレーションの設定でクラス名が決まっていればOK。で、再読み込みはあくまでもファイルだけが読み込まれる仕様
 
 # オンにした場合は最初のレジストレーションでプリントされる
-register_debug=True
+register_debug=False
 
 def register_classes():
     for cls,classmodule,part in loaded_classes_prefix:

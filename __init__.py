@@ -8,7 +8,7 @@ bl_info = {
     "name": "KSYN OPS",
     "description": "Viewport custum",
     "author": "KSYN",
-    "version": (0, 1, 7),
+    "version": (0, 1, 8),
     "blender": (3, 2, 0),
     "location": "shift ctrl Q key",
     "warning": "",
@@ -19,7 +19,7 @@ bl_info = {
 
 
 # リロードモジュール　開始
-def reload_unity_modules(name,debug=False):
+def reload_unity_modules(name, debug=False):
     import os
     import importlib
    
@@ -91,18 +91,6 @@ from . import properties
 from . import panel
 from . import menu
 
-
-
-from bpy.types import (
-        Menu,
-        Operator,
-        Panel,
-        PropertyGroup,
-
-        )
-
-
-from .utils.get_translang import get_translang
 from .registration import register_classes,unregister_classes
 from ksyn_ops.registration import addon_keymapscuspie
 
@@ -112,7 +100,7 @@ from ksyn_ops.registration import addon_keymapscuspie
 
 
 # 辞書登録関数　開始
-import os,codecs,csv
+import codecs,csv
 
 def GetTranslationDict():
     dict = {}

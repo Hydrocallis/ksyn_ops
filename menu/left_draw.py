@@ -9,7 +9,6 @@ def get_translang(eng,trans):
     
 def left_draw_edit_mode(row,box):
         
-
         row.label(text = "Slect Menu")
         row = box.row(align=True)
         row.operator("mesh.select_all", text="All").action = 'SELECT'
@@ -29,6 +28,7 @@ def left_draw_edit_mode(row,box):
         row.label(text = "Mesh deformation")
         row = box.row(align=True)
         row.operator("object.meshmirror_operator")
+        row.operator("mesh.convert_ngons_to_tris")
         row = box.row(align=True)
         row.operator("object.simplerotate")
         row.operator("object.originset_oparetor")

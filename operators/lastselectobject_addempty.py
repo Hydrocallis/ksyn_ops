@@ -6,16 +6,8 @@ from bpy.props import BoolProperty
 from bpy.props import FloatVectorProperty
 from bpy.props import FloatProperty
 from bpy.props import EnumProperty
-import bpy
 from ksyn_ops.utils.get_translang import get_translang
 
-import bpy
-import mathutils
-
-import bpy
-
-
-import bpy
 import mathutils
 
 def get_selected_objects_bottom_vertex_world_pos(seleobj):
@@ -39,15 +31,12 @@ def get_selected_objects_bottom_vertex_world_pos(seleobj):
 
     return bottom_vertex_world_pos
 
-def get_selected_objects_bounding_box_center():
-    """
-    選択したオブジェクト群のバウンディングボックスの中心の位置を取得する関数。
-
-    Returns:
-        mathutils.Vector: 選択したオブジェクト群のバウンディングボックスの中心の位置（ワールド座標）
-    """
-    selected_objects = bpy.context.selected_objects
+def get_selected_objects_bounding_box_center(selected_objects):
+    if not isinstance(selected_objects, list):
+        selected_objects = [selected_objects]
+    
     bb_center = mathutils.Vector()
+    
     for obj in selected_objects:
         obj_bb_min = obj.matrix_world @ mathutils.Vector(obj.bound_box[0])
         obj_bb_max = obj.matrix_world @ mathutils.Vector(obj.bound_box[6])
@@ -56,16 +45,6 @@ def get_selected_objects_bounding_box_center():
     return bb_center
 
 def get_bottom_vertex_world_pos(obj):
-    """
-    メッシュの一番底辺の頂点のワールド座標を取得する関数。
-
-    Args:
-        obj: bpy.types.Object, アクティブなオブジェクト
-
-    Returns:
-        bottom_vertex_world_pos: Vector, ボトム頂点のワールド座標
-    """
-    # オブジェクトの種類によって処理を分岐
     if obj.type == 'MESH':
         # メッシュデータを取得
         mesh = obj.data
@@ -118,8 +97,19 @@ def set_parent_with_transform(seleobj,parent_obj, maintain_transform=True):
 
 
 def main(self, context):
+
     seleobj = bpy.context.selected_objects
-    bb_center =  get_selected_objects_bounding_box_center()
+
+    if self.targe_centers == "sel_obj":
+        centerget = seleobj
+        center =  get_selected_objects_bounding_box_center(centerget)
+    elif self.targe_centers =="act_obj":
+        centerget = bpy.context.active_object
+        center =  get_selected_objects_bounding_box_center(centerget)
+    if self.targe_centers =="cursor":
+        center = tuple(bpy.context.scene.cursor.location)
+
+    bb_center =  get_selected_objects_bounding_box_center(seleobj)
 
     if self.bottom_type == "act_obj":
         obj = bpy.context.active_object
@@ -137,14 +127,19 @@ def main(self, context):
         # カーソルの位置を取得
         cursor_location = bpy.context.scene.cursor.location
         bb_center = Vector((bb_center[0],bb_center[1],cursor_location[2]))
-    else:
-        
-        pass
+
+    totalloc = (center[0],center[1],0) 
+    totalloc = (totalloc[0],totalloc[1],bb_center[2])
+    totalloc = tuple(map(sum, zip(totalloc, self.emlocation)))
 
 
-    totalloc =  bb_center + self.emlocation
+
+
+
+
 
     # emptysetting
+    # print('###',totalloc)
     bpy.ops.object.empty_add(
         type='PLAIN_AXES', align='WORLD', 
         location=totalloc, 
@@ -186,8 +181,15 @@ display_type_items = [
 bottom_types = [
     ("act_obj", "Active Object", "", 1),
     ("cursor", "Cursor", "", 2),
-    ("sele_center", get_translang("Select object Center","オブジェクト群の中心"), "", 3),
-    ("sele_bottom", get_translang("Select object Center","オブジェクト群の一番下"), "", 4),
+    # ("sele_center", get_translang("Select object Center","オブジェクト群の中心"), "", 3),
+    ("sele_bottom", get_translang("Bottom of object group","オブジェクト群の一番下"), "", 4),
+
+        ]
+
+target_center = [
+    ("act_obj", "Active Object", "", 1),
+    ("sel_obj", "Select Objects", "", 2),
+    ("cursor", "Cursor", "", 3),
 
         ]
 
@@ -201,10 +203,13 @@ class lastselectaddempty(bpy.types.Operator):
     parent : BoolProperty(default = True,name = "Parent")
     parent_chid_keep : BoolProperty(default = True,name=get_translang("Keeping the hierarchy in place","階層のキープ"))
     display_items : EnumProperty(items=display_type_items, default="SINGLE_ARROW")
-    bottom_type : EnumProperty(items=bottom_types, default="act_obj")
+    
+    targe_centers : EnumProperty(items=target_center, default="act_obj",name ="Target Center")
+    bottom_type : EnumProperty(items=bottom_types, default="act_obj",name ="Bottom Type")
     parent_keep_transform : BoolProperty(default = True,name=get_translang("Keep the transformation","変形をキープする"))
     emlocation : FloatVectorProperty(subtype="XYZ_LENGTH")
     display_size : FloatProperty(default= 1)
+
 
     @classmethod
     def poll(cls, context):

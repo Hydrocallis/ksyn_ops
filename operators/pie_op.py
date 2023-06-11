@@ -53,11 +53,17 @@ class Setting(Operator):
 
 
     def execute(self, context):
-        # obj = bpy.context.active_object
-        bpy.ops.screen.userpref_show()
-        bpy.context.preferences.active_section = 'ADDONS'
-        bpy.data.window_managers["WinMan"].addon_search = sys.modules['ksyn_ops'].bl_info.get("name")
-        # print('###',sys.modules[__package__].bl_info.get("version", (-1,-1,-1)))
+
+
+        addon_name = "ksyn_ops"
+        preferences = bpy.context.preferences
+        addon_prefs = preferences.addons[addon_name].preferences
+
+        bpy.ops.screen.userpref_show("INVOKE_DEFAULT")
+        addon_prefs.active_section = 'ADDONS'
+        bpy.ops.preferences.addon_expand(module = addon_name)
+        bpy.ops.preferences.addon_show(module = addon_name)
+
         return {'FINISHED'}
 
 class mesh_hide(Operator):
