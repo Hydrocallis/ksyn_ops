@@ -96,78 +96,6 @@ def set_parent_with_transform(seleobj,parent_obj, maintain_transform=True):
     # set_parent_with_transform(parent_obj, False)
 
 
-def main(self, context):
-
-    seleobj = bpy.context.selected_objects
-
-    if self.targe_centers == "sel_obj":
-        centerget = seleobj
-        center =  get_selected_objects_bounding_box_center(centerget)
-    elif self.targe_centers =="act_obj":
-        centerget = bpy.context.active_object
-        center =  get_selected_objects_bounding_box_center(centerget)
-    if self.targe_centers =="cursor":
-        center = tuple(bpy.context.scene.cursor.location)
-
-    bb_center =  get_selected_objects_bounding_box_center(seleobj)
-
-    if self.bottom_type == "act_obj":
-        obj = bpy.context.active_object
-        bottom_location = get_bottom_vertex_world_pos(obj)
-        bb_center = Vector((bb_center[0],bb_center[1],bottom_location[2]))
-    
-
-    if self.bottom_type == "sele_bottom":
-        obj = bpy.context.active_object
-        bottom_vertex_world_pos = get_selected_objects_bottom_vertex_world_pos(seleobj)
-        bb_center = Vector((bb_center[0],bb_center[1],bottom_vertex_world_pos[2]))
-
-    
-    elif self.bottom_type == "cursor":
-        # カーソルの位置を取得
-        cursor_location = bpy.context.scene.cursor.location
-        bb_center = Vector((bb_center[0],bb_center[1],cursor_location[2]))
-
-    totalloc = (center[0],center[1],0) 
-    totalloc = (totalloc[0],totalloc[1],bb_center[2])
-    totalloc = tuple(map(sum, zip(totalloc, self.emlocation)))
-
-
-
-
-
-
-
-    # emptysetting
-    # print('###',totalloc)
-    bpy.ops.object.empty_add(
-        type='PLAIN_AXES', align='WORLD', 
-        location=totalloc, 
-        scale=(1, 1, 1))
-
-    emptyobj = bpy.context.object
-    emptyobj.name = self.name
-    emptyobj.empty_display_type = self.display_items
-        
-    bpy.context.object.empty_display_size = self.display_size
-
-    if self.parent == True:
-        if self.parent_chid_keep != True:
-            for i in seleobj:
-                i.select_set(state = True)
-            
-                bpy.ops.object.parent_set(
-                    type='OBJECT',
-                    keep_transform=self.parent_keep_transform
-                    )
-        else:
-            # アクティブなオブジェクトを取得
-            parent_obj = bpy.context.active_object
-
-            # メソッドを呼び出し
-            set_parent_with_transform(seleobj,parent_obj,self.parent_keep_transform)
-
-
 display_type_items = [
     ("PLAIN_AXES", "Plain Axes", "", 1),
     ("ARROWS", "Arrows", "", 2),
@@ -200,15 +128,19 @@ class lastselectaddempty(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO','PRESET'}
 
     name : StringProperty(default = "Empty")
+
     parent : BoolProperty(default = True,name = "Parent")
+    parent_keep_transform : BoolProperty(default = True,name=get_translang("Keep the transformation","変形をキープする"))
     parent_chid_keep : BoolProperty(default = True,name=get_translang("Keeping the hierarchy in place","階層のキープ"))
-    display_items : EnumProperty(items=display_type_items, default="SINGLE_ARROW")
+    name_change : BoolProperty(default = False,name=get_translang("Name Change","Name Change"))
     
+    display_items : EnumProperty(items=display_type_items, default="SINGLE_ARROW")
     targe_centers : EnumProperty(items=target_center, default="act_obj",name ="Target Center")
     bottom_type : EnumProperty(items=bottom_types, default="act_obj",name ="Bottom Type")
-    parent_keep_transform : BoolProperty(default = True,name=get_translang("Keep the transformation","変形をキープする"))
+
     emlocation : FloatVectorProperty(subtype="XYZ_LENGTH")
     display_size : FloatProperty(default= 1)
+
 
 
     @classmethod
@@ -216,10 +148,88 @@ class lastselectaddempty(bpy.types.Operator):
         return context.active_object is not None
 
     def execute(self, context):
-        main(self, context)
+        self.cursor_loc = bpy.context.scene.cursor.location
+        self.actobj = bpy.context.active_object
+
+        seleobj = context.selected_objects
+        totalloc = self.getloacation(context, seleobj)
+        self.add_empty(context, totalloc, seleobj)
+        
+        if self.name_change:
+            self.name_changeadd(seleobj)
+
         return {'FINISHED'}
 
-    # def invoke(self, context, event):
-    #     wm = context.window_manager
-    #     return wm.invoke_props_dialog(self)
+    def getloacation(self, context, seleobj):
 
+        if self.targe_centers == "sel_obj":
+            centerget = seleobj
+            center =  get_selected_objects_bounding_box_center(centerget)
+        elif self.targe_centers =="act_obj":
+            centerget = self.actobj
+            center =  get_selected_objects_bounding_box_center(centerget)
+        if self.targe_centers =="cursor":
+            center = tuple(self.cursor_loc)
+
+        bb_center =  get_selected_objects_bounding_box_center(seleobj)
+
+        if self.bottom_type == "act_obj":
+            obj = self.actobj
+            bottom_location = get_bottom_vertex_world_pos(obj)
+            bb_center = Vector((bb_center[0],bb_center[1],bottom_location[2]))
+        
+
+        if self.bottom_type == "sele_bottom":
+            obj = self.actobj
+            bottom_vertex_world_pos = get_selected_objects_bottom_vertex_world_pos(seleobj)
+            bb_center = Vector((bb_center[0],bb_center[1],bottom_vertex_world_pos[2]))
+
+        
+        elif self.bottom_type == "cursor":
+            # カーソルの位置を取得
+            cursor_location = self.cursor_loc
+            bb_center = Vector((bb_center[0],bb_center[1],cursor_location[2]))
+
+        totalloc = (center[0],center[1],0) 
+        totalloc = (totalloc[0],totalloc[1],bb_center[2])
+        totalloc = tuple(map(sum, zip(totalloc, self.emlocation)))
+
+        return totalloc
+
+
+    def add_empty(self,context, totalloc, seleobj):
+
+        # emptysetting
+        # print('###',totalloc)
+        bpy.ops.object.empty_add(
+            type='PLAIN_AXES', align='WORLD', 
+            location=totalloc, 
+            scale=(1, 1, 1))
+
+        emptyobj = bpy.context.object
+        emptyobj.name = self.name
+        emptyobj.empty_display_type = self.display_items
+            
+        bpy.context.object.empty_display_size = self.display_size
+
+        if self.parent == True:
+            if self.parent_chid_keep != True:
+                for i in seleobj:
+                    i.select_set(state = True)
+                
+                    bpy.ops.object.parent_set(
+                        type='OBJECT',
+                        keep_transform=self.parent_keep_transform
+                        )
+            else:
+                # アクティブなオブジェクトを取得
+                parent_obj = self.actobj
+
+                # メソッドを呼び出し
+                set_parent_with_transform(seleobj,parent_obj,self.parent_keep_transform)
+
+    def name_changeadd(self,seleobj):
+        count = 1
+        for obj in seleobj:
+            obj.name = self.name +"_" + str(count)
+            count += 1

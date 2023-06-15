@@ -151,14 +151,15 @@ class SubdivisionShow(Operator):
     @classmethod
     def poll(cls, context):
         sub_mod = False
-        for mod in bpy.context.object.modifiers:
-            if mod.name == "Subdivision":
-                sub_mod = True
-                # print(sub_mod)
-            else:
-                pass
-        return sub_mod
-   
+        if bpy.context.object.type == 'MESH':
+            for mod in bpy.context.object.modifiers:
+                if mod.name == "Subdivision":
+                    sub_mod = True
+                    return sub_mod
+
+                else:
+                    pass
+    
     def execute(self, context):
         if context.object.modifiers["Subdivision"].show_on_cage == False:
             context.object.modifiers["Subdivision"].show_on_cage = True
