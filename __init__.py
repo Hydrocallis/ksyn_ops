@@ -8,7 +8,7 @@ bl_info = {
     "name": "KSYN OPS",
     "description": "Viewport custum",
     "author": "KSYN",
-    "version": (0, 1, 8),
+    "version": (0, 1, 9),
     "blender": (3, 2, 0),
     "location": "shift ctrl Q key",
     "warning": "",

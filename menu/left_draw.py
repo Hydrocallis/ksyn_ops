@@ -108,6 +108,7 @@ def left_draw(self):
         # row.operator("object.pie9_operator")
         row = box.row(align=True)
         row.operator("object.meshmirror_operator")
+        row.operator("ksyn.select_children_recursive")
         # 削除クリーンアップ関係
         row = box.row(align=True)
         row.label(text = "CleanUp")

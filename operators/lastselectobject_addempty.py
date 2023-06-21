@@ -110,7 +110,8 @@ bottom_types = [
     ("act_obj", "Active Object", "", 1),
     ("cursor", "Cursor", "", 2),
     # ("sele_center", get_translang("Select object Center","オブジェクト群の中心"), "", 3),
-    ("sele_bottom", get_translang("Bottom of object group","オブジェクト群の一番下"), "", 4),
+    ("sele_bottom", get_translang("Bottom of object group","オブジェクト群の一番下"), "", 3),
+    ("act_ojb_orijin", get_translang("Origin of active object","アクティブなオブジェクトの原点"), "", 4),
 
         ]
 
@@ -118,6 +119,7 @@ target_center = [
     ("act_obj", "Active Object", "", 1),
     ("sel_obj", "Select Objects", "", 2),
     ("cursor", "Cursor", "", 3),
+    ("act_ojb_orijin", get_translang("Origin of active object","アクティブなオブジェクトの原点"), "", 4),
 
         ]
 
@@ -130,9 +132,9 @@ class lastselectaddempty(bpy.types.Operator):
     name : StringProperty(default = "Empty")
 
     parent : BoolProperty(default = True,name = "Parent")
-    parent_keep_transform : BoolProperty(default = True,name=get_translang("Keep the transformation","変形をキープする"))
-    parent_chid_keep : BoolProperty(default = True,name=get_translang("Keeping the hierarchy in place","階層のキープ"))
-    name_change : BoolProperty(default = False,name=get_translang("Name Change","Name Change"))
+    parent_keep_transform : BoolProperty(default = True, name=get_translang("Keep the transformation","変形をキープする"))
+    parent_chid_keep : BoolProperty(default = False, name=get_translang("Keeping the hierarchy in place","階層のキープ"))
+    name_change : BoolProperty(default = False, name=get_translang("Name Change","Name Change"))
     
     display_items : EnumProperty(items=display_type_items, default="SINGLE_ARROW")
     targe_centers : EnumProperty(items=target_center, default="act_obj",name ="Target Center")
@@ -168,10 +170,15 @@ class lastselectaddempty(bpy.types.Operator):
         elif self.targe_centers =="act_obj":
             centerget = self.actobj
             center =  get_selected_objects_bounding_box_center(centerget)
-        if self.targe_centers =="cursor":
+
+        elif self.targe_centers =="cursor":
             center = tuple(self.cursor_loc)
 
+        elif self.targe_centers == "act_ojb_orijin":
+            center = bpy.context.object.location
+
         bb_center =  get_selected_objects_bounding_box_center(seleobj)
+
 
         if self.bottom_type == "act_obj":
             obj = self.actobj
@@ -179,7 +186,7 @@ class lastselectaddempty(bpy.types.Operator):
             bb_center = Vector((bb_center[0],bb_center[1],bottom_location[2]))
         
 
-        if self.bottom_type == "sele_bottom":
+        elif self.bottom_type == "sele_bottom":
             obj = self.actobj
             bottom_vertex_world_pos = get_selected_objects_bottom_vertex_world_pos(seleobj)
             bb_center = Vector((bb_center[0],bb_center[1],bottom_vertex_world_pos[2]))
@@ -188,6 +195,11 @@ class lastselectaddempty(bpy.types.Operator):
         elif self.bottom_type == "cursor":
             # カーソルの位置を取得
             cursor_location = self.cursor_loc
+            bb_center = Vector((bb_center[0],bb_center[1],cursor_location[2]))
+
+        elif self.bottom_type == "act_ojb_orijin":
+            # カーソルの位置を取得
+            cursor_location = bpy.context.object.location
             bb_center = Vector((bb_center[0],bb_center[1],cursor_location[2]))
 
         totalloc = (center[0],center[1],0) 

@@ -10,6 +10,7 @@ addon_path = os.path.dirname(os.path.realpath(__file__))
 addon_keymapscuspie = []
 
 class_paths = [
+    ("operators", "pie_op", "ReName"),
     ("operators", "pie_op", "AutoSommth"),
     ("operators", "pie_op", "Setting"),
     ("operators", "pie_op", "mesh_hide"),
@@ -58,6 +59,7 @@ class_paths = [
     ("operators", "weightpaint_value_change", "weightpaint_value_chnage"),
     ("operators", "wordlorijin_move_ot", "WORDORIJINMOVE"),
     ("operators", "ConvertNgonsToTris", "ConvertNgonsToTrisOperator"),
+    ("operators", "selechildrecursive", "SelectChildrenRecursiveOperator"),
     ("ohters", "preference", "ExampleAddonPreferences"),
 ]
 

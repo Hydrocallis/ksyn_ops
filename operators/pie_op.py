@@ -13,6 +13,22 @@ from math import radians
 
 
 
+class ReName(Operator):
+    bl_idname = "ksyn.renameop"
+    bl_label = "Rename Object"
+    bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
+    bl_options = {'REGISTER', 'UNDO', 'PRESET'}
+
+    name : bpy.props.StringProperty(name="Name",default="Object")
+
+    def execute(self, context):
+        count = 1
+        for obj in bpy.context.selected_objects:
+            obj.name = "{}_{:03d}".format(self.name, count)
+            count += 1
+        return {'FINISHED'}
+
+
 class AutoSommth(Operator):
     bl_idname = "object.pie10_operator"
     bl_label = "スムーズ"
@@ -38,13 +54,11 @@ class AutoSommth(Operator):
                 else:
                     obj.data.use_auto_smooth = False
                 obj.data.auto_smooth_angle = self.auto_smooth_angle
-
-
-
-        
-
+     
 
         return {'FINISHED'}
+
+
 
 class Setting(Operator):
     bl_idname = "ksyn_ops.setting_operator"

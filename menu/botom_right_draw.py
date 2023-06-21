@@ -45,6 +45,7 @@ def botom_right_draw(self):
         # other_menu.menu('PIE_MT_InstansMenu', icon='RIGHTARROW_THIN', text = "オブジェクトコピー")
         other_menu.operator("object.look_for_no_geometry_operator")
         other_menu.operator("object.lastselectaddempty")
+        other_menu.operator("ksyn.renameop")
         # メニューにおけるオペレターの確認
         if hasattr(bpy.types, bpy.ops.bake.simpleobjectbake.idname()):
             other_menu.operator("bake.simpleobjectbake").cmd = "bake"
