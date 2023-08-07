@@ -11,6 +11,7 @@ def right_draw(self):
     row.label(text=get_translang("display-related","表示関係"))
     row = box.row(align=True)
     row.operator("object.wiredisplay_operator")
+    row.operator("object.change_light_energy",text=get_translang("Light Energy","ライトの強さ変更"))
     row = box.row(align=True)
     row.operator("object.viewshadingshowface_operator")
     row = box.row(align=True)
@@ -26,4 +27,7 @@ def right_draw(self):
     row = box.row(align=True)
     row.operator("object.copyasset_operator")
     row.operator("object.material_append",text=get_translang("Matarial Append","マテリアル適応"))
+    row = box.row(align=True)
+    row.operator("object.add_primitive",text=get_translang("Add primitives","プリミティブを追加"))
+    row.operator("object.import_node_groups",text=get_translang("Import Node Groups","ジオメトリーノードを追加"))
 

@@ -4,13 +4,72 @@ from bpy.types import (
         Operator,
         )
 
-
-
 from ksyn_ops.utils.get_translang import get_translang
 from ksyn_ops.utils.operators_utils import description
 from mathutils import Matrix
 from math import radians
+import pathlib
+from bpy.props import FloatProperty
 
+class ChangeLightEnergyOperator(bpy.types.Operator):
+    bl_idname = "object.change_light_energy"
+    bl_label = "Change Light Energy"
+    bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
+    bl_options = {'REGISTER', 'UNDO'}
+    
+    
+    energy : FloatProperty(name="Energy", default=1.0, min=0.0)
+    
+
+    def execute(self, context):
+        selected_objects = bpy.context.selected_objects
+        
+        for obj in selected_objects:
+            if obj.type == 'LIGHT':
+                obj.data.energy = self.energy
+        
+        return {'FINISHED'}
+
+
+
+
+class ImportNodeGroupsOperator(Operator):
+    bl_idname = "object.import_node_groups"
+    bl_label = "Import Node Groups"
+    bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
+    bl_options = {'REGISTER', 'UNDO' }
+  
+    operation : bpy.props.EnumProperty(
+        name="Operation",
+        description="Choose an operation",
+        items=[
+            ('CURVE_TO_MESH', 'Curve to Mesh', 'Convert curve to mesh'),
+            ('NOIZE_TRANSFORM', 'Noize Transform', 'Apply noize transform'),
+        ]
+        )
+    def execute(self, context):
+        p_file = pathlib.Path(__file__)
+        filepath=  str(p_file.parents[1].joinpath("asset", 'ksyn_nodes.blend'))
+        if self.operation =="CURVE_TO_MESH":
+            node_name = "curve_to_mesh"
+        elif self.operation =="NOIZE_TRANSFORM":
+            node_name = "Noize Transform"
+        
+        # Open the file
+        with bpy.data.libraries.load(filepath) as (data_from, data_to):
+            print(data_from.node_groups)
+            # Import node groups
+            data_to.node_groups = [m for m in data_from.node_groups if m == node_name]
+        
+        # Get the imported node group
+        node_group = data_to.node_groups[0] if data_to.node_groups else None
+        
+        # Apply the geometry node to the object
+        obj = bpy.context.object
+        modifier = obj.modifiers.new(name=f"KSYN {node_name} Node", type="NODES")
+        modifier.node_group = node_group
+        
+        return {'FINISHED'}
 
 
 class ReName(Operator):
@@ -20,12 +79,61 @@ class ReName(Operator):
     bl_options = {'REGISTER', 'UNDO', 'PRESET'}
 
     name : bpy.props.StringProperty(name="Name",default="Object")
+        # モードの選択肢
+    mode_items = [
+        ("ACTIVE_OBJECT", "アクティブなオブジェクト", "アクティブなオブジェクトをベースにする"),
+        ("COLLECTION_NAME", "コレクションの名前", "コレクションの名前を使用する"),
+    ]
+    
+    use_Custom : bpy.props.BoolProperty(name="Use Custom Name")
+    
+    # モードのプロパティ
+    mode: bpy.props.EnumProperty(
+        items=mode_items,
+        name="モード",
+        description="オブジェクトのベースとなる要素を選択します",
+        default="ACTIVE_OBJECT"
+    )
+
+    
+    def Based_on_the_name_of_the_active_object(self,active_object,seleobj):
+        for obj in seleobj:
+                            
+            # 名前を基準
+            if self.mode == "ACTIVE_OBJECT":
+                base_name = active_object.name
+            else:
+                base_name = obj.users_collection[0].name
+
+            # アクティブなオブジェクトはリネーム対象から外す
+            if self.mode == "COLLECTION_NAME":
+                pass
+            else:
+                if obj == bpy.context.active_object:
+                    continue  
+
+            # オブジェクトの名前に_をつけて数字のカウントをする
+            count = 1
+            new_name = base_name + "_" + str(count)
+            while bpy.data.objects.get(new_name) is not None:
+                count += 1
+                new_name = base_name + "_" + str(count)
+
+            # オブジェクトの名前を変更する
+            obj.name = new_name
 
     def execute(self, context):
-        count = 1
-        for obj in bpy.context.selected_objects:
-            obj.name = "{}_{:03d}".format(self.name, count)
-            count += 1
+        seleobj = bpy.context.selected_objects
+        if self.use_Custom:
+            self.Based_on_the_name_of_the_active_object(bpy.context.object, seleobj)
+        else:
+            count = 1
+
+            for obj in bpy.context.selected_objects:
+
+                    obj.name = "{}_{:03d}".format(self.name, count)
+                    count += 1
+
         return {'FINISHED'}
 
 
@@ -58,8 +166,6 @@ class AutoSommth(Operator):
 
         return {'FINISHED'}
 
-
-
 class Setting(Operator):
     bl_idname = "ksyn_ops.setting_operator"
     bl_label = get_translang("Setting","設定")
@@ -88,6 +194,35 @@ class mesh_hide(Operator):
     def execute(self, context):
         bpy.ops.mesh.hide(unselected=True)
         return {'FINISHED'}
+
+class toggle_mode(Operator):
+    bl_idname = "object.toggle_mode"
+    bl_label = "Toggle Mode"
+    bl_options = {'REGISTER', 'UNDO', 'PRESET'}
+
+    
+    mode_options = [
+        ("OBJECT", "Object", "Object Mode"),
+        ("EDIT", "Edit", "Edit Mode"),
+        ("SCULPT", "Sculpt", "Sculpt Mode")
+    ]
+    
+    mode: bpy.props.EnumProperty(
+        items=mode_options,
+        name="Mode",
+        description="Select the mode to toggle"
+    )
+    
+    def execute(self, context):
+        if self.mode == "OBJECT":
+            bpy.ops.object.mode_set(mode="OBJECT")
+        elif self.mode == "EDIT":
+            bpy.ops.object.mode_set(mode="EDIT")
+        elif self.mode == "SCULPT":
+            bpy.ops.object.mode_set(mode="SCULPT")
+        
+        return {'FINISHED'}
+
 
 class rotationx(Operator):
     bl_idname = "object.pie8_operator"
@@ -165,14 +300,17 @@ class SubdivisionShow(Operator):
     @classmethod
     def poll(cls, context):
         sub_mod = False
-        if bpy.context.object.type == 'MESH':
-            for mod in bpy.context.object.modifiers:
-                if mod.name == "Subdivision":
-                    sub_mod = True
-                    return sub_mod
+        try:
+            if bpy.context.object.type == 'MESH':
+                for mod in bpy.context.object.modifiers:
+                    if mod.name == "Subdivision":
+                        sub_mod = True
+                        return sub_mod
 
-                else:
-                    pass
+                    else:
+                        pass
+        except AttributeError:
+            pass
     
     def execute(self, context):
         if context.object.modifiers["Subdivision"].show_on_cage == False:

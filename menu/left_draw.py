@@ -74,8 +74,10 @@ def left_draw_edit_mode(row,box):
         #　メッシュ操作関係
         row.label(text = "Mesh Oparator")
         row = box.row(align=True)
-        row.operator("object.select_mesh_separate_operator")
+        row.operator("object.select_mesh_separate_operator",text=get_translang('Mesh Duplicate','選択メッシュ複製')).duplicate_move = True
+        row.operator("object.select_mesh_separate_operator",text=get_translang('Mesh Separate','選択メッシュ分離')).duplicate_move = False
         row.operator("mesh.mesh_ot_bicect_mirror")
+        row.operator("object.separate_and_join_operator")
 
         row.label(text = "            ")# ダミー
 
@@ -122,9 +124,11 @@ def left_draw(self):
         row.label(text = "Boolean")
         row = box.row(align=True)
         row.operator("object.boolonoff_operator")
+        row.operator("object.boolean_operator")
         row = box.row(align=True)
 
         row.operator("object.selectobjectbool_operator").cmd = "simpleboolean"
+        row.operator("object.geometry_nodes_operator")
         row.operator("object.selectobjectbool_operator",text=get_translang('Appy Boolean','ブーリアン適応')).cmd = "applyboolean"
 
 

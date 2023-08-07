@@ -28,9 +28,7 @@ class PIE_MT_InstansMenu2(Menu):
         layout.prop(props, "edit_int")
         
         layout.prop(props, "color_pic")
-
-
-        
+       
         layout.operator("object.uvgridmat")
 
         matname_list =[mat.name for mat in bpy.data.materials]
@@ -78,10 +76,5 @@ class PIE_MT_InstansMenu(Menu):
         layout = self.layout
         props = context.scene.myedit_property_group
 
-        # サブメニューの登録
-        layout.operator("object.objectinstansmirror_operator", text="オブジェクトのミラー化", icon="MOD_MIRROR")
-        layout.operator("object.objectinstans_operator", text="インスタンス化", icon="OUTLINER_OB_GROUP_INSTANCE")
-        layout.separator()
-        layout.operator("object.cleanupinstans_operator", text="クリーンアップ", icon="FILE_REFRESH")
 
 

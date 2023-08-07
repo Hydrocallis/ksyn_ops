@@ -15,11 +15,9 @@ def modeset(self,col):
     # row = layout.row(align=True)
     # sub = row.row(align=True)
     col.ui_units_x = 5.5
-    col.operator_menu_enum(
-        "object.mode_set", "mode",
-        text=bpy.app.translations.pgettext_iface(act_mode_item.name, act_mode_i18n_context),
-        icon=act_mode_item.icon,
-    )
+    col.operator("object.toggle_mode",text="Object").mode ="OBJECT"
+    col.operator("object.toggle_mode",text="Edit").mode ="EDIT"
+    col.operator("object.toggle_mode",text="Sculpt").mode ="SCULPT"
 
 def top_draw(self):
     layout = self.layout

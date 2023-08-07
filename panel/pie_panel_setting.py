@@ -164,6 +164,27 @@ class SIMPLEOBJECT_PT_PANEL(PIE3D_PT_PIESETTINGARM_main,Panel):
                     )
                 otherbox.menu('PIE_MT_InstansMenu', icon='RIGHTARROW_THIN', text = "オブジェクトコピー")
                 
+        layout.separator()
+
+        layout.operator(
+            "object.visual_transform_apply",
+            text="Visual Transform",
+        )
+        layout.operator(
+            "object.convert",
+            text="Visual Geometry to Mesh",
+        ).target = 'MESH'
+        layout.operator("object.link_objects_to_new_scene_operator", text=get_translang('New Scene','オブジェクトをシーンへ'))
+        layout.operator("object.duplicates_make_real")
+        layout.operator("object.join_hierarchy_objects",text=get_translang("Join Hierarchy Objects","階層オブジェクトの結合"))
+        layout.operator("object.square_empty_layout_operator",text=get_translang("Square Empty Layout Operator","正方形の空のレイアウト"))
+
+        layout.label(text=get_translang('Instans Object','インスタンス化'))
+                # サブメニューの登録
+        layout.operator("object.objectinstansmirror_operator", text="オブジェクトのミラー化", icon="MOD_MIRROR")
+        layout.operator("object.objectinstans_operator", text="インスタンス化", icon="OUTLINER_OB_GROUP_INSTANCE")
+        layout.separator()
+        layout.operator("object.cleanupinstans_operator", text="クリーンアップ", icon="FILE_REFRESH")
 
 
 

@@ -10,10 +10,13 @@ addon_path = os.path.dirname(os.path.realpath(__file__))
 addon_keymapscuspie = []
 
 class_paths = [
+    ("operators", "pie_op", "ChangeLightEnergyOperator"),
+    ("operators", "pie_op", "ImportNodeGroupsOperator"),
     ("operators", "pie_op", "ReName"),
     ("operators", "pie_op", "AutoSommth"),
     ("operators", "pie_op", "Setting"),
     ("operators", "pie_op", "mesh_hide"),
+    ("operators", "pie_op", "toggle_mode"),
     ("operators", "pie_op", "rotationx"),
     ("operators", "pie_op", "rotationy"),
     ("operators", "pie_op", "flatselect"),
@@ -46,6 +49,7 @@ class_paths = [
     ("operators", "object_easy_array", "objarray"),
     ("operators", "objectinstans", "objectinstans"),
     ("operators", "objectinstansmirror", "objectinstansmirror"),
+    ("operators", "objectinstansmirror", "LinkObjectsToNewSceneOperator"),
     ("operators", "orijin_seting", "originset"),
     ("operators", "PiePropsSetting", "PiePropsSetting"),
     ("operators", "select_mesh_separate_operator", "select_mesh_separate_operator"),
@@ -60,9 +64,27 @@ class_paths = [
     ("operators", "wordlorijin_move_ot", "WORDORIJINMOVE"),
     ("operators", "ConvertNgonsToTris", "ConvertNgonsToTrisOperator"),
     ("operators", "selechildrecursive", "SelectChildrenRecursiveOperator"),
+    ("operators", "separate_and_join", "SeparateAndJoinOperator"),
+    ("operators", "mode_actobje_loc", "MoveSelectedToLastOperator"),
+    ("operators", "add_primitive", "AddPrimitiveOperator"),
+    ("operators", "join_hierarchy_objects", "OBJECT_OT_JoinHierarchyObjects"),
+    ("operators", "square_empty_layout_operator", "SquareEmptyLayoutOperator"),
+    ("operators", "create_autoliner_empy", "OBJECT_OT_ParentActiveObject"),
+    ("operators", "create_autoliner_empy", "CreateEmptyOperator"),
+    ("operators", "create_autoliner_empy", "activeCreateEmptyOperator"),
+    ("operators", "create_autoliner_empy", "PlaceEmptyOperator"),
+    ("operators", "create_autoliner_empy", "RenameSelectedObjectsOperator"),
+    ("operators", "create_autoliner_empy", "RenameSelectedObjects_collection_Operator"),
+    ("operators", "translate_property", "TranslatePropertyOperator"),
+    ("operators", "translate_property", "TranslatePropertyPanel"),
+    ("operators", "joint_blean", "BooleanOperator"),
+    ("operators", "geometry_nodes_operator", "GeometryNodesOperator"),
+    ("operators", "create_window_mesh", "WINDOW_CREATE_objectPanel"),
+    ("operators", "create_window_mesh", "WINDOW_CREATE_CreateBars"),
+
     ("ohters", "preference", "ExampleAddonPreferences"),
 ]
-
+ 
 prefix = "KSYNOPS_OT_"
 prefix_ohters = "KSYNOPS_OH_"
 

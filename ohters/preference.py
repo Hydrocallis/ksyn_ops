@@ -8,6 +8,11 @@ class ExampleAddonPreferences(AddonPreferences):
     # when defining this in a submodule of a python package.
     bl_idname = "ksyn_ops"
 
+
+    api_key: StringProperty(
+        name='API Key', description='API Key for the DeepL API', subtype='PASSWORD', default='')
+    
+
     filepath: StringProperty(
         name="Example File Path",
         subtype='FILE_PATH',
@@ -27,6 +32,7 @@ class ExampleAddonPreferences(AddonPreferences):
         # layout.prop(self, "filepath")
         # layout.prop(self, "number")
         layout.prop(self, "adminmode")
+        layout.prop(self, "api_key")
 
         import rna_keymap_ui 
         layout = self.layout

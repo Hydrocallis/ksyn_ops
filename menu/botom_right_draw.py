@@ -46,6 +46,7 @@ def botom_right_draw(self):
         other_menu.operator("object.look_for_no_geometry_operator")
         other_menu.operator("object.lastselectaddempty")
         other_menu.operator("ksyn.renameop")
+        other_menu.operator("object.move_selected_to_last")
         # メニューにおけるオペレターの確認
         if hasattr(bpy.types, bpy.ops.bake.simpleobjectbake.idname()):
             other_menu.operator("bake.simpleobjectbake").cmd = "bake"

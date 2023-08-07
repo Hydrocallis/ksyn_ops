@@ -93,7 +93,8 @@ from . import menu
 
 from .registration import register_classes,unregister_classes
 from ksyn_ops.registration import addon_keymapscuspie
-
+from ksyn_ops.operators.create_autoliner_empy import OUTLINER_MT_objectregister,OUTLINER_MT_objectunregister
+from ksyn_ops.operators.translate_property import translate_property_register,translate_property_unregister
 
 # アドオンの項目の設定項目
 
@@ -127,6 +128,8 @@ def register():
     menu.register()
     properties.register()
     register_classes()
+    OUTLINER_MT_objectregister()
+    translate_property_register()
 
 
     # 通常の３Dモードの（オブジェクトモードでしか何故か登録できない）キーマップ登録
@@ -164,6 +167,8 @@ def unregister():
     menu.unregister()
     properties.unregister()
     unregister_classes()
+    OUTLINER_MT_objectunregister()
+    translate_property_unregister
 
 
     wm = bpy.context.window_manager
