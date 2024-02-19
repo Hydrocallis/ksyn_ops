@@ -27,7 +27,7 @@ def right_draw(self):
     row = box.row(align=True)
     row.operator("object.copyasset_operator")
     row.operator("object.material_append",text=get_translang("Matarial Append","マテリアル適応"))
-    row.operator("wm.import_fbx_from_clipboard")
+    row.operator("wm.import_3dfile_from_clipboard")
     row = box.row(align=True)
     row.operator("object.add_primitive",text=get_translang("Add primitives","プリミティブを追加"))
     row.operator("object.import_node_groups",text=get_translang("Import Node Groups","ジオメトリーノードを追加"))

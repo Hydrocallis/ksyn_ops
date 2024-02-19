@@ -33,7 +33,7 @@ except ModuleNotFoundError:
 import os
 
 class ImportFBXFromClipboardOperator(bpy.types.Operator):
-    bl_idname = "wm.import_fbx_from_clipboard"
+    bl_idname = "wm.import_3dfile_from_clipboard"
     bl_label = get_translang("Import FBX GLB from Clipboard","クリップボードからFBX GLBインポート")
     
     def execute(self, context):
