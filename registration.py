@@ -10,8 +10,12 @@ addon_path = os.path.dirname(os.path.realpath(__file__))
 addon_keymapscuspie = []
 
 class_paths = [
+    ("operators", "pie_op", "ImportFBXFromClipboardOperator"),
+    ("operators", "pie_op", "RenameActiveNodeOperator"),
     ("operators", "pie_op", "ChangeLightEnergyOperator"),
     ("operators", "pie_op", "ImportNodeGroupsOperator"),
+    ("operators", "pie_op", "MakeRealAndParentOperator"),
+    ("operators", "pie_op", "BevelExtrudeOperator"),
     ("operators", "pie_op", "ReName"),
     ("operators", "pie_op", "AutoSommth"),
     ("operators", "pie_op", "Setting"),

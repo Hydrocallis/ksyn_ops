@@ -31,6 +31,7 @@ def left_draw_edit_mode(row,box):
         row.operator("mesh.convert_ngons_to_tris")
         row = box.row(align=True)
         row.operator("object.simplerotate")
+        row.operator("mesh.bevel_extrude")
         row.operator("object.originset_oparetor")
         row = box.row(align=True)
         props= bpy.context.scene.myedit_property_group

@@ -8,7 +8,7 @@ bl_info = {
     "name": "KSYN OPS",
     "description": "Viewport custum",
     "author": "KSYN",
-    "version": (0, 1, 9),
+    "version": (1, 0, 0),
     "blender": (3, 2, 0),
     "location": "shift ctrl Q key",
     "warning": "",
@@ -92,9 +92,9 @@ from . import panel
 from . import menu
 
 from .registration import register_classes,unregister_classes
-from ksyn_ops.registration import addon_keymapscuspie
-from ksyn_ops.operators.create_autoliner_empy import OUTLINER_MT_objectregister,OUTLINER_MT_objectunregister
-from ksyn_ops.operators.translate_property import translate_property_register,translate_property_unregister
+from ksyn_ops.registration import addon_keymapscuspie# type: ignore
+from ksyn_ops.operators.create_autoliner_empy import OUTLINER_MT_objectregister,OUTLINER_MT_objectunregister # type: ignore
+from ksyn_ops.operators.translate_property import translate_property_register,translate_property_unregister# type: ignore
 
 # アドオンの項目の設定項目
 
@@ -150,6 +150,16 @@ def register():
         km = wm.keyconfigs.addon.keymaps.new(name='Mesh', space_type='EMPTY')
         kmi = km.keymap_items.new('wm.call_menu_pie', 'Q', 'PRESS', shift=True, ctrl=True)
         kmi.properties.name = "PIE_MT_viewnumpad_mypanel"# これが被ってるとバグる
+        addon_keymapscuspie.append((km, kmi))
+
+    wm = bpy.context.window_manager
+ 
+    # メッシュモードでのキーマップ登録
+    if wm.keyconfigs.addon:
+        # Views numpad
+        km = wm.keyconfigs.addon.keymaps.new(name='Node Editor', space_type='NODE_EDITOR')
+        kmi = km.keymap_items.new('wm.call_menu_pie', 'Q', 'PRESS', shift=True, ctrl=True)
+        kmi.properties.name = "KSN_MT_node_editerpiemenu_menu"# これが被ってるとバグる
         addon_keymapscuspie.append((km, kmi))
 
     wm = bpy.context.window_manager

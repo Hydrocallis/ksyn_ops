@@ -1,7 +1,7 @@
 
 from bpy.types import Operator, AddonPreferences
 from bpy.props import StringProperty, IntProperty, BoolProperty
-from ksyn_ops.registration import addon_keymapscuspie
+from ksyn_ops.registration import addon_keymapscuspie# type: ignore
 
 class ExampleAddonPreferences(AddonPreferences):
     # this must match the add-on name, use '__package__'
@@ -10,21 +10,21 @@ class ExampleAddonPreferences(AddonPreferences):
 
 
     api_key: StringProperty(
-        name='API Key', description='API Key for the DeepL API', subtype='PASSWORD', default='')
+        name='API Key', description='API Key for the DeepL API', subtype='PASSWORD', default='') # type: ignore
     
 
     filepath: StringProperty(
         name="Example File Path",
         subtype='FILE_PATH',
-    )
+    ) # type: ignore
     number: IntProperty(
         name="Example Number",
         default=4,
-    )
+    )# type: ignore
     adminmode: BoolProperty(
         name="Admin Mode",
         default=False,
-    )
+    )# type: ignore
 
     def draw(self, context):
         layout = self.layout

@@ -29,13 +29,14 @@ if "bpy" in locals():
 
 
 
-from .pieviewmenu import PIE_MT_ViewNumpad
+from .pieviewmenu import PIE_MT_ViewNumpad,KSN_MT_node_editerpiemenu
 from .instansmenu import PIE_MT_InstansMenu,PIE_MT_InstansMenu2
 
 
 
 classes = (
 	PIE_MT_ViewNumpad,
+	KSN_MT_node_editerpiemenu,
     PIE_MT_InstansMenu,
     PIE_MT_InstansMenu2,
 

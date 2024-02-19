@@ -3,13 +3,153 @@ import bpy,sys,inspect
 from bpy.types import (
         Operator,
         )
+# これはVSCODE上ではアドオン単体で開いているので通るが、ブレンダー上だと通らない。
+# つまり、VSCODD上でリンクするためのダミー
+try:
+    from utils.operators_utils import description 
+    from utils.operators_utils import description 
+    from utils.get_translang import get_translang 
 
-from ksyn_ops.utils.get_translang import get_translang
-from ksyn_ops.utils.operators_utils import description
+# ブレンダー上ではaddonフォルダがSYSにアペンドされてるため、
+# 上位に潜る際はこのパス（ADDONが基準でその配下のフォルダは認識される）が通る
+    
+except ImportError:
+    from ksyn_ops.utils.get_translang import get_translang # type: ignore
+    from ksyn_ops.utils.operators_utils import description # type: ignore
+    from ksyn_ops.utils.get_translang import get_translang # type: ignore
+
+
 from mathutils import Matrix
 from math import radians
 import pathlib
 from bpy.props import FloatProperty
+
+import bpy
+try:
+    import win32clipboard
+except ModuleNotFoundError:
+    pass
+    # print('### please install python module win32')
+import os
+
+class ImportFBXFromClipboardOperator(bpy.types.Operator):
+    bl_idname = "wm.import_fbx_from_clipboard"
+    bl_label = get_translang("Import FBX GLB from Clipboard","クリップボードからFBX GLBインポート")
+    
+    def execute(self, context):
+        # クリップボードを開く
+        win32clipboard.OpenClipboard()
+
+        # FileName形式のクリップボードデータを取得
+        filename_format = win32clipboard.RegisterClipboardFormat('FileNameW')
+        if win32clipboard.IsClipboardFormatAvailable(filename_format):
+            input_filenames = win32clipboard.GetClipboardData(filename_format)
+
+            # バイト列をUTF-16でデコード
+            input_filenames = input_filenames.decode('utf-16', errors='ignore')
+
+            # ファイル名はNULL文字で区切られているので、それを基に分割
+            filenames = input_filenames.split('\x00')
+
+            for filename in filenames:
+                if filename:  # ファイル名が空でない場合のみ処理
+                    # ファイル拡張子を正しく表示
+                    # ファイル名から拡張子を取得
+                    base_filename, file_extension = os.path.splitext(filename)
+
+                    # FBXファイルをインポート
+                    if file_extension.lower() == '.fbx':
+                        bpy.ops.import_scene.fbx(filepath=filename)
+
+                    # GLBファイルをインポート
+                    elif file_extension.lower() == '.glb':
+                        bpy.ops.import_scene.gltf(filepath=filename)
+
+        # クリップボードを閉じる
+        win32clipboard.CloseClipboard()
+        
+        return {'FINISHED'}
+
+
+
+class RenameActiveNodeOperator(bpy.types.Operator):
+    bl_idname = "object.rename_active_node"
+    bl_label = "Rename Active Node"
+    bl_options = {'REGISTER', 'UNDO'}
+    
+    name: bpy.props.StringProperty(name="New Name") # type: ignore
+    label: bpy.props.StringProperty(name="New Label") # type: ignore # type: ignore
+    same_name_label: bpy.props.BoolProperty(name="Same as Name", default=True) # type: ignore
+    
+    def invoke(self, context, event):
+        return context.window_manager.invoke_props_dialog(self)
+    
+    def execute(self, context):
+        for area in bpy.context.screen.areas:
+            if area.type == 'NODE_EDITOR':
+                node_area = area
+        
+        active_node = node_area.spaces.active.node_tree.nodes.active
+        
+        active_node.name = self.name
+        if self.same_name_label:
+            active_node.label = self.name
+        else:
+            active_node.label = self.label
+        
+        return {'FINISHED'}
+    
+    def draw(self,context):
+        self.layout.prop(self,"name")
+        self.layout.prop(self,"same_name_label")
+    
+        if not self.same_name_label:
+            self.layout.prop(self,"label")
+
+class BevelExtrudeOperator(bpy.types.Operator):
+    bl_idname = "mesh.bevel_extrude"
+    bl_label = "Bevel and Extrude"
+    bl_options = {'REGISTER', 'UNDO'}
+    
+    bevel_amount: FloatProperty(
+        name="Bevel Amount",
+        default=0.005,
+        min=0.0,
+        description="Amount of bevel offset"
+    ) # type: ignore
+    
+    extrude_amount: FloatProperty(
+        name="Extrude Amount",
+        default=-0.00475417,
+        description="Amount of extrude offset"
+    ) # type: ignore
+    
+    def execute(self, context):
+        bpy.ops.mesh.bevel(offset=self.bevel_amount, offset_pct=0, affect='EDGES')
+        
+        bpy.ops.mesh.extrude_region_shrink_fatten(
+            MESH_OT_extrude_region={
+                "use_normal_flip": False,
+                "use_dissolve_ortho_edges": False,
+                "mirror": False
+            },
+            TRANSFORM_OT_shrink_fatten={
+                "value": self.extrude_amount,
+                "use_even_offset": False,
+                "mirror": False,
+                "use_proportional_edit": False,
+                "proportional_edit_falloff": 'SMOOTH',
+                "proportional_size": 2.743,
+                "use_proportional_connected": False,
+                "use_proportional_projected": False,
+                "snap": False,
+                "release_confirm": False,
+                "use_accurate": False
+            }
+        )
+        
+        return {'FINISHED'}
+
 
 class ChangeLightEnergyOperator(bpy.types.Operator):
     bl_idname = "object.change_light_energy"
@@ -18,7 +158,7 @@ class ChangeLightEnergyOperator(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
     
     
-    energy : FloatProperty(name="Energy", default=1.0, min=0.0)
+    energy : FloatProperty(name="Energy", default=1.0, min=0.0) # type: ignore
     
 
     def execute(self, context):
@@ -31,7 +171,62 @@ class ChangeLightEnergyOperator(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class MakeRealAndParentOperator(bpy.types.Operator):
+    bl_idname = "object.make_real_and_parent"
+    bl_label = "Make Real and Parent"
+    bl_description = "Make selected objects real and parent them to an empty"
+    bl_options = {'REGISTER', 'UNDO'}
+    
+    create_empty: bpy.props.BoolProperty(
+        name="Create Empty",
+        default=True,
+        description="Create an empty object to parent the selected objects"
+    ) # type: ignore
+    select_empty: bpy.props.BoolProperty(
+        name="Select Empty",
+        default=True,
+        description="Create an empty object Select"
+    ) # type: ignore
+    
+    @classmethod
+    def poll(cls, context):
+        return context.selected_objects
+    
+    def execute(self, context):
+        # インスタンスからリアライズ
+        bpy.ops.object.duplicates_make_real()
+        
+        # 選択したオブジェクトを取得
+        selected_objects = context.selected_objects
+        
+        # 各オブジェクトのモディファイアをチェックして削除
+        for obj in selected_objects:
+            modifiers = obj.modifiers
+            for modifier in modifiers:
+                if modifier.type == 'NODES':
+                    modifiers.remove(modifier)
+        
+        active_object = context.active_object
+        
+        if self.create_empty:
+            # エンプティを作成
+            empty = bpy.data.objects.new("Empty", None)
+            context.collection.objects.link(empty)
+            
+            # エンプティの位置をアクティブなオブジェクトの位置に設定
+            empty.name = active_object.name + "_empty"
+            
+            # 選択したオブジェクトをエンプティの子に設定
+            for obj in selected_objects:
+                obj.parent = empty
+            if self.select_empty:
+                empty.select_set(True)
+                bpy.context.view_layer.objects.active = empty
 
+            
+        
+        return {'FINISHED'}
+    
 
 class ImportNodeGroupsOperator(Operator):
     bl_idname = "object.import_node_groups"
@@ -39,14 +234,19 @@ class ImportNodeGroupsOperator(Operator):
     bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
     bl_options = {'REGISTER', 'UNDO' }
   
+
     operation : bpy.props.EnumProperty(
         name="Operation",
         description="Choose an operation",
         items=[
             ('CURVE_TO_MESH', 'Curve to Mesh', 'Convert curve to mesh'),
             ('NOIZE_TRANSFORM', 'Noize Transform', 'Apply noize transform'),
+            ('NOIZE_TRANSFORM', 'Noize Transform', 'Apply noize transform'),
+            ('Rotation_Array', 'Rotation Array', 'Rotation Array '),
         ]
-        )
+        ) # type: ignore
+
+    
     def execute(self, context):
         p_file = pathlib.Path(__file__)
         filepath=  str(p_file.parents[1].joinpath("asset", 'ksyn_nodes.blend'))
@@ -54,6 +254,9 @@ class ImportNodeGroupsOperator(Operator):
             node_name = "curve_to_mesh"
         elif self.operation =="NOIZE_TRANSFORM":
             node_name = "Noize Transform"
+        
+        elif self.operation =="Rotation_Array":
+            node_name = "Rotation Array"
         
         # Open the file
         with bpy.data.libraries.load(filepath) as (data_from, data_to):
@@ -78,14 +281,14 @@ class ReName(Operator):
     bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
     bl_options = {'REGISTER', 'UNDO', 'PRESET'}
 
-    name : bpy.props.StringProperty(name="Name",default="Object")
+    name : bpy.props.StringProperty(name="Name",default="Object") # type: ignore
         # モードの選択肢
     mode_items = [
         ("ACTIVE_OBJECT", "アクティブなオブジェクト", "アクティブなオブジェクトをベースにする"),
         ("COLLECTION_NAME", "コレクションの名前", "コレクションの名前を使用する"),
     ]
     
-    use_Custom : bpy.props.BoolProperty(name="Use Custom Name")
+    use_Custom : bpy.props.BoolProperty(name="Use Custom Name") # type: ignore
     
     # モードのプロパティ
     mode: bpy.props.EnumProperty(
@@ -93,7 +296,7 @@ class ReName(Operator):
         name="モード",
         description="オブジェクトのベースとなる要素を選択します",
         default="ACTIVE_OBJECT"
-    )
+    ) # type: ignore
 
     
     def Based_on_the_name_of_the_active_object(self,active_object,seleobj):
@@ -143,11 +346,11 @@ class AutoSommth(Operator):
     bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
     bl_options = {'REGISTER', 'UNDO', 'PRESET'}
 
-    sommth : bpy.props.BoolProperty(name=get_translang('Sommth','スムース'),default=True)
-    auto_sommth_bool : bpy.props.BoolProperty(name=get_translang('Auto Smooth','Auto Smooth'),default=True)
+    sommth : bpy.props.BoolProperty(name=get_translang('Sommth','スムース'),default=True) # type: ignore
+    auto_sommth_bool : bpy.props.BoolProperty(name=get_translang('Auto Smooth','Auto Smooth'),default=True) # type: ignore
     auto_smooth_angle : bpy.props.FloatProperty(name=get_translang('Angle','Angle'),
                                                 subtype='ANGLE',
-                                                default=0.523599)
+                                                default=0.523599) # type: ignore
 
     def execute(self, context):
         if self.sommth ==True:
@@ -211,7 +414,7 @@ class toggle_mode(Operator):
         items=mode_options,
         name="Mode",
         description="Select the mode to toggle"
-    )
+    ) # type: ignore
     
     def execute(self, context):
         if self.mode == "OBJECT":

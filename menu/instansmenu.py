@@ -55,15 +55,7 @@ class PIE_MT_InstansMenu2(Menu):
                 
         #         layout.template_list("MESH_UL_uvmaps", "uvmaps", obj_data, "uv_layers", obj_data.uv_layers, "active_index", rows=2)
 
-
-
-
-
-        
-
-
-
-
+       
 class PIE_MT_InstansMenu(Menu):
     bl_idname = "PIE_MT_InstansMenu"
     bl_label = "PIE_MT_InstansMenu"
