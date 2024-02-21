@@ -63,7 +63,7 @@ class KSN_MT_node_editerpiemenu(Menu):
 class PIE_MT_ViewNumpad(Menu):
     addon_version = get_addon_version(__package__.split(".")[0])
 
-    bl_idname = "PIE_MT_viewnumpad_mypanel"
+    bl_idname = "KSYN_MT_viewnumpad_panel"
     bl_label = f"KSYN OPS Pie Menu v{addon_version[0]}.{addon_version[1]}.{addon_version[2]}"
     bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
  

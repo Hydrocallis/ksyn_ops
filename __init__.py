@@ -8,7 +8,7 @@ bl_info = {
     "name": "KSYN OPS",
     "description": "Viewport custum",
     "author": "KSYN",
-    "version": (1, 0, 0),
+    "version": (1, 0, 1),
     "blender": (3, 2, 0),
     "location": "shift ctrl Q key",
     "warning": "",
@@ -139,7 +139,7 @@ def register():
         km = wm.keyconfigs.addon.keymaps.new(name='3D View', space_type='VIEW_3D')
         kmi = km.keymap_items.new('wm.call_menu_pie', 'Q', 'PRESS', shift=True, ctrl=True)
         
-        kmi.properties.name = "PIE_MT_viewnumpad_mypanel"# これが被ってるとバグる
+        kmi.properties.name = "KSYN_MT_viewnumpad_panel"# これが被ってるとバグる
         addon_keymapscuspie.append((km, kmi))
 
     wm = bpy.context.window_manager
@@ -149,7 +149,7 @@ def register():
         # Views numpad
         km = wm.keyconfigs.addon.keymaps.new(name='Mesh', space_type='EMPTY')
         kmi = km.keymap_items.new('wm.call_menu_pie', 'Q', 'PRESS', shift=True, ctrl=True)
-        kmi.properties.name = "PIE_MT_viewnumpad_mypanel"# これが被ってるとバグる
+        kmi.properties.name = "KSYN_MT_viewnumpad_panel"# これが被ってるとバグる
         addon_keymapscuspie.append((km, kmi))
 
     wm = bpy.context.window_manager
