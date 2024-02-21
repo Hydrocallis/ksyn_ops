@@ -87,6 +87,10 @@ class_paths = [
     ("operators", "create_window_mesh", "WINDOW_CREATE_CreateBars"),
 
     ("ohters", "preference", "ExampleAddonPreferences"),
+    ("ohters", "set_module", "PipInstall"),
+    ("ohters", "set_module", "PipUninstall"),
+    ("ohters", "set_module", "PipListInstall"),
+    ("ohters", "set_module", "OpenAddonPreferences"),
 ]
  
 prefix = "KSYNOPS_OT_"

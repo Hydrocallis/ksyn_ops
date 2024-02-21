@@ -136,23 +136,24 @@ def register():
     wm = bpy.context.window_manager
     if wm.keyconfigs.addon:
         # Views numpad
-        km = wm.keyconfigs.addon.keymaps.new(name='3D View', space_type='VIEW_3D')
+        km = wm.keyconfigs.addon.keymaps.new(name='3D View Generic', space_type='VIEW_3D')
         kmi = km.keymap_items.new('wm.call_menu_pie', 'Q', 'PRESS', shift=True, ctrl=True)
         
         kmi.properties.name = "KSYN_MT_viewnumpad_panel"# これが被ってるとバグる
         addon_keymapscuspie.append((km, kmi))
 
-    wm = bpy.context.window_manager
-    
-    # メッシュモードでのキーマップ登録
-    if wm.keyconfigs.addon:
-        # Views numpad
-        km = wm.keyconfigs.addon.keymaps.new(name='Mesh', space_type='EMPTY')
-        kmi = km.keymap_items.new('wm.call_menu_pie', 'Q', 'PRESS', shift=True, ctrl=True)
-        kmi.properties.name = "KSYN_MT_viewnumpad_panel"# これが被ってるとバグる
-        addon_keymapscuspie.append((km, kmi))
 
     wm = bpy.context.window_manager
+    
+    # # メッシュモードでのキーマップ登録
+    # if wm.keyconfigs.addon:
+    #     # Views numpad
+    #     km = wm.keyconfigs.addon.keymaps.new(name='Mesh', space_type='EMPTY')
+    #     kmi = km.keymap_items.new('wm.call_menu_pie', 'Q', 'PRESS', shift=True, ctrl=True)
+    #     kmi.properties.name = "KSYN_MT_viewnumpad_panel"# これが被ってるとバグる
+    #     addon_keymapscuspie.append((km, kmi))
+
+    # wm = bpy.context.window_manager
  
     # メッシュモードでのキーマップ登録
     if wm.keyconfigs.addon:

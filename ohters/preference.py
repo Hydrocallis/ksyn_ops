@@ -1,7 +1,16 @@
 
 from bpy.types import Operator, AddonPreferences
 from bpy.props import StringProperty, IntProperty, BoolProperty
-from ksyn_ops.registration import addon_keymapscuspie# type: ignore
+
+
+try:
+    from ..registration import addon_keymapscuspie
+    from set_module import install
+
+except ImportError:
+
+    from ksyn_ops.registration import addon_keymapscuspie # type: ignore
+    from ksyn_ops.ohters.set_module import install # type: ignore
 
 class ExampleAddonPreferences(AddonPreferences):
     # this must match the add-on name, use '__package__'
@@ -33,6 +42,7 @@ class ExampleAddonPreferences(AddonPreferences):
         # layout.prop(self, "number")
         layout.prop(self, "adminmode")
         layout.prop(self, "api_key")
+        install(self)
 
         import rna_keymap_ui 
         layout = self.layout
