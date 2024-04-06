@@ -3,6 +3,11 @@ import mathutils
 from bpy.types import Operator
 
 import subprocess
+ 
+try:
+    from ksyn_ops.utils.get_translang import get_translang   # type: ignore
+except ImportError:
+    from ..utils.get_translang import get_translang 
 
 
 
@@ -80,6 +85,7 @@ class activeCreateEmptyOperator(bpy.types.Operator):
 
         return {'FINISHED'}
 
+
 class PlaceEmptyOperator(Operator):
     bl_idname = "object.place_empty"
     bl_label = "Place Empty"
@@ -119,87 +125,104 @@ class PlaceEmptyOperator(Operator):
 
 # リネーム
 class RenameSelectedObjects_collection_Operator(bpy.types.Operator):
+    bl_description2= """
+                        There is an object with the same name to be renamed 
+                        based on the active object(Collection). 
+                        Rename it to avoid it if it is an.
+                        
+                        アクティブなオブジェクト(コレクション)を基準にリネームする同じ名前の
+                        オブジェクトが存在する場合はそれを避けてリネームする"""
+    
     bl_idname = "object.rename_selected_objects_collection"
     bl_label = "Rename Selected Objects Collection Name"
-    bl_description = f' CLASS_NAME_IS={sys._getframe().f_code.co_name}/n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n '
+    bl_description = f' CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n \n{bl_description2}'
 
     bl_options = {'REGISTER', 'UNDO'}
 
-    cmd: bpy.props.StringProperty(default="", options={'HIDDEN'})
+    cmd: bpy.props.StringProperty(default="", options={'HIDDEN'}) # type: ignore
 
 
     def execute(self, context):
 
 
         # アクティブなオブジェクトを取得
-        active_object = bpy.context.active_object
+        active_object = bpy.context.object
         collection = active_object.users_collection[0]
         # 選択したオブジェクトの名前を変更する
+            # アクティブなオブジェクトの名前を基準にする
+        if self.cmd == "COLLECTION":
+            base_name = collection.name
+
+        elif self.cmd == "SELECT":
+            base_name = active_object.name
+        else:
+            base_name = collection.name
 
         for index, obj in enumerate(bpy.context.selected_objects,start=1):
-            # アクティブなオブジェクトの名前を基準にする
-            if self.cmd == "COLLECTION":
-                base_name = collection.name
-            if self.cmd == "SELECT":
-                base_name = active_object.name
 
+
+            # アクティブなオブジェクトはリネーム対象から外す
+            if self.cmd == "SELECT":
+                if obj == bpy.context.active_object:
+                    continue
             # オブジェクトの名前に_をつけて数字のカウントをする
             count = 1
-            new_name = base_name + "." + str(count).zfill(3)
+            new_name = base_name + "_" + str(count).zfill(3)
             while bpy.data.objects.get(new_name) is not None:
-                count += 1
                 new_name = base_name + "_" +  str(count).zfill(3)
+                count += 1
+
 
             # オブジェクトの名前を変更する
             obj.name = new_name
 
         return {'FINISHED'}
 
-class RenameSelectedObjectsOperator(bpy.types.Operator):
-    bl_idname = "object.rename_selected_objects"
-    bl_label = "Rename Selected Objects"
-    bl_description = f' CLASS_NAME_IS={sys._getframe().f_code.co_name}/n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n '
-    bl_options = {'REGISTER', 'UNDO'}
+# class RenameSelectedObjectsOperator(bpy.types.Operator):
+#     bl_idname = "object.rename_selected_objects"
+#     bl_label = "Rename Selected Objects"
+#     bl_description = f' CLASS_NAME_IS={sys._getframe().f_code.co_name}/n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n '
+#     bl_options = {'REGISTER', 'UNDO'}
 
 
 
     
-    def select_all_children_of_selected_objects(self):
-        # 選択したオブジェクトを取得
-        selected_objects = bpy.context.selected_objects
+#     def select_all_children_of_selected_objects(self):
+#         # 選択したオブジェクトを取得
+#         selected_objects = bpy.context.selected_objects
 
-        # 選択したオブジェクトの子オブジェクトを選択
-        for obj in selected_objects:
-            for child in obj.children:
-                child.select_set(True)
+#         # 選択したオブジェクトの子オブジェクトを選択
+#         for obj in selected_objects:
+#             for child in obj.children:
+#                 child.select_set(True)
                 
 
-    def execute(self, context):
-        # アクティブなオブジェクトを取得
-        active_object = bpy.context.active_object
+#     def execute(self, context):
+#         # アクティブなオブジェクトを取得
+#         active_object = bpy.context.active_object
 
-        self.select_all_children_of_selected_objects()
+#         self.select_all_children_of_selected_objects()
 
-        # 選択したオブジェクトの名前を変更する
-        for obj in bpy.context.selected_objects:
-            # アクティブなオブジェクトの名前を基準にする
-            base_name = active_object.name
+#         # 選択したオブジェクトの名前を変更する
+#         for obj in bpy.context.selected_objects:
+#             # アクティブなオブジェクトの名前を基準にする
+#             base_name = active_object.name
 
-            # アクティブなオブジェクトはリネーム対象から外す
-            if obj == bpy.context.active_object:
-                continue
+#             # アクティブなオブジェクトはリネーム対象から外す
+#             if obj == bpy.context.active_object:
+#                 continue
 
-            # オブジェクトの名前に_をつけて数字のカウントをする
-            count = 1
-            new_name = base_name + "_" + str(count)
-            while bpy.data.objects.get(new_name) is not None:
-                count += 1
-                new_name = base_name + "_" + str(count)
+#             # オブジェクトの名前に_をつけて数字のカウントをする
+#             count = 1
+#             new_name = base_name + "_" + str(count)
+#             while bpy.data.objects.get(new_name) is not None:
+#                 count += 1
+#                 new_name = base_name + "_" + str(count)
 
-            # オブジェクトの名前を変更する
-            obj.name = new_name
+#             # オブジェクトの名前を変更する
+#             obj.name = new_name
 
-        return {'FINISHED'}
+#         return {'FINISHED'}
 
 # その他
 
@@ -227,8 +250,7 @@ class OBJECT_OT_ParentActiveObject(bpy.types.Operator):
 class ExportSelectedObjectsToFbx(Operator):
     bl_idname = "object.export_selected_to_fbx"
     bl_label = "Export Selected Objects to FBX"
-    cmd: bpy.props.StringProperty(default="", options={'HIDDEN'})
-
+    cmd: bpy.props.StringProperty(default="", options={'HIDDEN'}) # type: ignore
 
     
     def get_file_size(self,filepath):
@@ -297,6 +319,10 @@ class ExportSelectedObjectsToFbx(Operator):
 
         return {'FINISHED'}
     
+def renameop(layout):
+    layout.operator("object.rename_selected_objects_collection",text=get_translang("Changed according to base name (based on collection)","ベース名に準じて変更(コレクションをベースに)")).cmd ="COLLECTION"
+    layout.operator("object.rename_selected_objects_collection",text=get_translang("Changed according to base name (based on object)","ベース名に準じて変更(オブジェクトをベースに)")).cmd ="SELECT"
+
 class ksyn_outliner_AssistMenu(bpy.types.Menu):
     bl_idname = "OUTLINER_MT_assist_menu"
     bl_label = "Assist Menu"
@@ -305,12 +331,9 @@ class ksyn_outliner_AssistMenu(bpy.types.Menu):
         layout = self.layout
 
         # 補助機能に関連するメニュー項目を追加
-        layout.operator("object.export_selected_to_fbx",text="FBX EXPORT(Move Location)").cmd ="open floder"
-        layout.operator("object.export_selected_to_fbx",text="FBX EXPORT(Not Move Location)").cmd ="not_move"
+        renameop(layout)
         layout.separator()
 
-        layout.operator("object.rename_selected_objects_collection",text="Rename Base(Select Collection)").cmd ="COLLECTION"
-        layout.operator("object.rename_selected_objects_collection",text="Rename Base(Select OBJ)").cmd ="SELECT"
 
 def register():
     bpy.utils.register_class(ExportSelectedObjectsToFbx)
@@ -330,8 +353,11 @@ def draw_menu(self, context):
     # layout.operator_enum("object.parent_set", "type")
     layout.operator_enum("object.parent_clear", "type")
     layout.separator()
-    layout.operator("object.rename_selected_objects")
-    layout.operator("object.rename_selected_objects_collection")
+    renameop(layout)
+    layout.separator()
+    layout.operator("object.join")
+    layout.menu("VIEW3D_MT_object_apply")
+    layout.menu("VIEW3D_MT_object_convert")
     layout.separator()
     layout.operator("object.active_create_empty")
     layout.operator("object.create_empty")

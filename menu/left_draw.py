@@ -17,6 +17,7 @@ def left_draw_edit_mode(row,box):
         row = box.row(align=True)
         row.operator("object.pie18_operator")
         row.operator("mesh.select_linked", text="Linked")
+        row.operator("ksyn.get_face_by_side")
         row.menu("VIEW3D_MT_edit_mesh_select_similar")
 
         row = box.row(align=True)
@@ -125,11 +126,11 @@ def left_draw(self):
         row.label(text = "Boolean")
         row = box.row(align=True)
         row.operator("object.boolonoff_operator")
-        row.operator("object.boolean_operator")
+        # row.operator("object.boolean_operator")
         row = box.row(align=True)
 
         row.operator("object.selectobjectbool_operator").cmd = "simpleboolean"
-        row.operator("object.geometry_nodes_operator")
+        # row.operator("object.geometry_nodes_operator")
         row.operator("object.selectobjectbool_operator",text=get_translang('Appy Boolean','ブーリアン適応')).cmd = "applyboolean"
 
 

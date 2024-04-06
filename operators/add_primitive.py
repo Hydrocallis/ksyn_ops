@@ -81,43 +81,43 @@ class AddPrimitiveOperator(bpy.types.Operator):
         name="Primitive Type",
         items=primitive_types,
         default="CIRCLE"
-    )
+    ) # type: ignore
     
     location : FloatVectorProperty(
         name="Location",
         default=(0, 0, 0),
         subtype='TRANSLATION',
         size=3
-    )
+    ) # type: ignore
     
     rotation : FloatVectorProperty(
         name="Rotation",
         default=(0, 0, 0),
         subtype='EULER',
-    )
+    ) # type: ignore
     
     scale : FloatVectorProperty(
         name="Scale",
         default=(1, 1, 1),
         subtype='XYZ',
-    )
+    ) # type: ignore
         
     use_average_pos: bpy.props.BoolProperty(
         name="Use Average Position",
         description="Place the average position",
         default=True
-    )
+    ) # type: ignore
     use_select_rot: bpy.props.BoolProperty(
         name="Use select rotation",
         description="Use select rotation",
         default=True
-    )
+    ) # type: ignore
 
     remember_and_reselect_faces: bpy.props.BoolProperty(
         name="remember and reselect faces",
         description="remember and reselect faces",
         default=False
-    )
+    ) # type: ignore
 
 
     width: bpy.props.BoolProperty(
@@ -125,7 +125,7 @@ class AddPrimitiveOperator(bpy.types.Operator):
         description="Desired width for the selected vertices",
         default=True,
 
-    )
+    ) # type: ignore
     
     @classmethod
     def get_face_rotation(cls):

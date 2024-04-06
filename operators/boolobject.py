@@ -24,6 +24,9 @@ class BoolOnOff(Operator):
     bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
     bl_options = {'REGISTER', 'UNDO'}
 
+
+
+
     def execute(self, context):
         
         ob = bpy.context.object
@@ -31,18 +34,14 @@ class BoolOnOff(Operator):
         # ※選択したオブジェクトのテクスチャーとワイヤーとレンダー表示のオンオフ
         for obj in obs:
             if obj.display_type == 'TEXTURED':
-                print(obj)
-                print(bpy.context.object)
                 obj.display_type = 'WIRE'
                 bpy.context.object.hide_render = True
-                print(obj.display_type)
-                print("finished")
             elif obj.display_type == 'WIRE':
                 obj.display_type = 'TEXTURED'
                 bpy.context.object.hide_render = False
 
         return {'FINISHED'}
-
+booleanname='ksynbooly'
 def get_translang(eng,trans):
     prev = bpy.context.preferences.view
     if prev.language =='ja_JP' and prev.use_translate_interface == True:
@@ -112,32 +111,6 @@ def checkunlinkcol(selectobj, selcolname):
                     # print(colobj.name)
                     bpy.data.collections[checkcol.name].objects.unlink(colobj)
                     
-
-# アクティブなオブジェクトにブールをかける
-def selected_mulch(self, obs,activeob,parent_bool):
-
-    for sel_obj in obs:
-        # アクティブなオブジェクトにブールモディファイアを適応
-        bool = activeob.modifiers.new(name='ksynbooly', type='BOOLEAN')
-        # 選択したオブジェクトを適応
-        bool.object = sel_obj
-        bool.operation = 'DIFFERENCE'
-        bool.solver = 'FAST'
-        
-        # アクティブオブジェクト以外をブールフォルダに移動する。（既存のコレクションはアンリンク）
-        if bpy.context.view_layer.objects.active != sel_obj:
-            wireon(sel_obj)
-            if self.move_colection_bool == True:
-                linkcolobject(sel_obj)
-                checkunlinkcol(sel_obj, "BOOL")
-
-    #　最後に選択したオブジェクトにペアレントするかどうか。
-    if parent_bool == True:
-        bpy.ops.object.parent_set(type='OBJECT', keep_transform=True)
-    else:
-        pass
-
-
 # 最後のオブジェクトをブールコレクションに移動
 def collectionmove(activeob):
     wireon(activeob)
@@ -146,33 +119,98 @@ def collectionmove(activeob):
         checkunlinkcol(activeob, "BOOL")
 
 
-# 選択したオブジェクトにアクティブなオブジェクトのブールをかける
-def selected_single_bool(self, obs,activeob):
-    
+def add_triangul(add_tryi, obj):
+    if add_tryi:
+        if obj.modifiers.get("Bool Triangulate"):
+            act_obj=bpy.context.view_layer.objects.active 
+            bpy.context.view_layer.objects.active = obj
+            obj_mod_count=len(obj.modifiers)-1
+            # トライアングルモディファイをもとに戻す
+            bpy.ops.object.modifier_move_to_index(modifier="Bool Triangulate", index=obj_mod_count)
+            #　return to the point (of a discussion)
+            bpy.context.view_layer.objects.active = act_obj
+
+        else:
+            tri_modi = obj.modifiers.new(name='Bool Triangulate', type='TRIANGULATE')
+
+# アクティブなオブジェクトにブールをかける
+def selected_mulch(self, obs,activeob,parent_bool,operation_enum,add_tryi):
+
     for sel_obj in obs:
         # アクティブなオブジェクトにブールモディファイアを適応
-        bool = sel_obj.modifiers.new(name='booly', type='BOOLEAN')
-        # 選択したオブジェクトアクティブオブジェクトを適応
-        bool.object = activeob
-        bool.operation = 'DIFFERENCE'
+        bool = activeob.modifiers.new(name=booleanname, type='BOOLEAN')
+        # 選択したオブジェクトを適応
+        bool.object = sel_obj
+        if operation_enum=="SLICE":
+            bool.operation = "DIFFERENCE"
+        else:
+            bool.operation = operation_enum
         bool.solver = 'FAST'
+
+
+        
+        # アクティブオブジェクト以外をブールフォルダに移動する。（既存のコレクションはアンリンク）
+        if bpy.context.view_layer.objects.active != sel_obj:
+            wireon(sel_obj)
+            if self.move_colection_bool == True:
+                linkcolobject(sel_obj)
+                checkunlinkcol(sel_obj, "BOOL")
+
+    add_triangul(add_tryi, activeob)
+
+    #　最後に選択したオブジェクトにペアレントするかどうか。
+    if parent_bool == True:
+        bpy.ops.object.parent_set(type='OBJECT', keep_transform=True)
+    else:
+        pass
+
+
+
+# 選択したオブジェクトにアクティブなオブジェクトのブールをかける
+def selected_single_bool(self, obs,activeob,operation_enum,add_tryi):
+
+   
+    for sel_obj in obs:
+                # アクティブなオブジェクトにブールモディファイアを適応
+        bool = sel_obj.modifiers.new(name=booleanname, type='BOOLEAN')
+        # 選択したオブジェクトアクティブオブジェクトを適応
+
+        bool.object = activeob
+        if operation_enum=="SLICE":
+            bool.operation = "DIFFERENCE"
+        else:
+            bool.operation = operation_enum
+
+        bool.solver = 'FAST'
+        add_triangul(add_tryi, sel_obj)
+
         # 最後のオブジェクトをブールコレクションに移動
         if self.move_colection_bool == True:
             collectionmove(activeob)
         else:
             wireon(activeob)
+        
 
 
-def draw_main(self):
-    if self.cmd =="applyboolean":
-        pass
-    elif self.cmd =="simpleboolean":
+    if operation_enum=="SLICE":
+        activeob.select_set(False)
 
-        self.layout.prop(self,"parent_bool")
-        self.layout.prop(self,"selected_mulch_bool")
-        self.layout.prop(self,"move_colection_bool")
+        bpy.ops.object.duplicate_move()
 
-def main(self, selected_mulch_bool, parent_bool):
+        for sel_obj in bpy.context.selected_objects:
+            obs.append(sel_obj)
+            if add_tryi:
+                bool = sel_obj.modifiers[-2]
+            else:
+                bool = sel_obj.modifiers[-1]
+
+            bool.operation = "INTERSECT"
+
+    # print("###list",obs)
+
+
+
+def main(self, selected_mulch_bool, parent_bool,operation_enum,add_tryi):
 
     # 削りたい対象のオブジェクト（アクティブ）を定義
     activeob = bpy.context.active_object
@@ -185,11 +223,11 @@ def main(self, selected_mulch_bool, parent_bool):
 
     # 一つのオブジェクトだけ削りたい時（アクティブオブジェクト以外は非ブール）
     if selected_mulch_bool == True:
-        selected_mulch(self, obs,activeob,parent_bool)
+        selected_mulch(self, obs,activeob,parent_bool,operation_enum,add_tryi)
 
     # 複数のオブジェクトだけ削りたい時（アクティブオブジェクトは非ブール）
     else:
-        selected_single_bool(self, obs,activeob)
+        selected_single_bool(self, obs,activeob,operation_enum,add_tryi)
 
 
 class SelectObjectBool(Operator):
@@ -198,29 +236,68 @@ class SelectObjectBool(Operator):
     bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
     bl_options = {'REGISTER', 'UNDO'}
 
-    cmd: bpy.props.StringProperty(default="", options={'HIDDEN'})
+    options = [
+        ('DIFFERENCE', 'Difference', 'Difference'),
+        ('UNION', 'Union', 'Union'),
+        ('INTERSECT', 'Intersect', 'Intersect'),
+        ('SLICE', 'slice', 'slice')
+        ]
+    
+    operation_enum: bpy.props.EnumProperty(
+        name="operation",
+        items=options,
+        description=""
+        ) # type: ignore
+    
+    cmd: bpy.props.StringProperty(default="", options={'HIDDEN'}) # type: ignore
 
     
     parent_bool: bpy.props.BoolProperty(
                                     name=get_translang('Parent','親子化'),
                                     default=True,
-                                    )
+                                    ) # type: ignore
     selected_mulch_bool: bpy.props.BoolProperty(
                                     name=get_translang('selected_mulch_bool','複数でブール'),
                                     default=True,
-                                    )
+                                    ) # type: ignore
     
     move_colection_bool: bpy.props.BoolProperty(
                                     name=get_translang('move colection','コレクション移動'),
                                     default=True,
-                                    )
+                                    ) # type: ignore
+    add_tryi_bool: bpy.props.BoolProperty(
+                                    name=get_translang('Triangulation modifier added','三角化モディファイア追加'),
+                                    default=True,
+                                    ) # type: ignore
+
+
+
+
+    def draw_main(self):
+        if self.cmd =="applyboolean":
+            pass
+        elif self.cmd =="simpleboolean":
+
+            self.layout.prop(self,"parent_bool")
+            self.layout.prop(self,"selected_mulch_bool")
+            self.layout.prop(self,"move_colection_bool")
+
+            self.layout.prop_enum(self, "operation_enum", "DIFFERENCE")        
+            self.layout.prop_enum(self, "operation_enum", "UNION")        
+            self.layout.prop_enum(self, "operation_enum", "INTERSECT") 
+            
+            if not self.selected_mulch_bool:
+                self.layout.prop_enum(self, "operation_enum", "SLICE")        
+
+            self.layout.prop(self,"add_tryi_bool")
 
     def execute(self, context):
         if self.cmd =="applyboolean":
             applyboolean(context.object)
         else:
-            main(self, self.selected_mulch_bool, self.parent_bool)
+            main(self, self.selected_mulch_bool, self.parent_bool,self.operation_enum,self.add_tryi_bool)
     
         return {'FINISHED'}
     def draw(self, context):
-        draw_main(self)
+        
+        self.draw_main()

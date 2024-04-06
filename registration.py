@@ -10,6 +10,7 @@ addon_path = os.path.dirname(os.path.realpath(__file__))
 addon_keymapscuspie = []
 
 class_paths = [
+    ("operators", "pie_op", "GetFacebySide"),
     ("operators", "pie_op", "ImportFBXFromClipboardOperator"),
     ("operators", "pie_op", "RenameActiveNodeOperator"),
     ("operators", "pie_op", "ChangeLightEnergyOperator"),
@@ -77,7 +78,7 @@ class_paths = [
     ("operators", "create_autoliner_empy", "CreateEmptyOperator"),
     ("operators", "create_autoliner_empy", "activeCreateEmptyOperator"),
     ("operators", "create_autoliner_empy", "PlaceEmptyOperator"),
-    ("operators", "create_autoliner_empy", "RenameSelectedObjectsOperator"),
+    # ("operators", "create_autoliner_empy", "RenameSelectedObjectsOperator"),
     ("operators", "create_autoliner_empy", "RenameSelectedObjects_collection_Operator"),
     ("operators", "translate_property", "TranslatePropertyOperator"),
     ("operators", "translate_property", "TranslatePropertyPanel"),

@@ -32,46 +32,222 @@ except ModuleNotFoundError:
     # print('### please install python module win32')
 import os
 
+
+
+
 class ImportFBXFromClipboardOperator(bpy.types.Operator):
     bl_idname = "wm.import_3dfile_from_clipboard"
     bl_label = get_translang("Import FBX GLB from Clipboard","クリップボードからFBX GLBインポート")
     
     def execute(self, context):
-        # クリップボードを開く
-        win32clipboard.OpenClipboard()
+        # # クリップボードを開く
+        # win32clipboard.OpenClipboard()
 
-        # FileName形式のクリップボードデータを取得
-        filename_format = win32clipboard.RegisterClipboardFormat('FileNameW')
-        if win32clipboard.IsClipboardFormatAvailable(filename_format):
-            input_filenames = win32clipboard.GetClipboardData(filename_format)
+        # # FileName形式のクリップボードデータを取得
+        # filename_format = win32clipboard.RegisterClipboardFormat('FileNameW')
+        # if win32clipboard.IsClipboardFormatAvailable(filename_format):
+        #     input_filenames = win32clipboard.GetClipboardData(filename_format)
+        #     print("###input_filenames",input_filenames)
 
-            # バイト列をUTF-16でデコード
-            input_filenames = input_filenames.decode('utf-16', errors='ignore')
+        #     # バイト列をUTF-16でデコード
+        #     input_filenames = input_filenames.decode('utf-16', errors='ignore')
 
-            # ファイル名はNULL文字で区切られているので、それを基に分割
-            filenames = input_filenames.split('\x00')
+        #     # ファイル名はNULL文字で区切られているので、それを基に分割
+        #     filenames = input_filenames.split('\x00')
 
-            for filename in filenames:
-                if filename:  # ファイル名が空でない場合のみ処理
-                    # ファイル拡張子を正しく表示
-                    # ファイル名から拡張子を取得
-                    base_filename, file_extension = os.path.splitext(filename)
+        #     for filename in filenames:
+        #         if filename:  # ファイル名が空でない場合のみ処理
+        #             # ファイル拡張子を正しく表示
+        #             # ファイル名から拡張子を取得
+        #             base_filename, file_extension = os.path.splitext(filename)
 
-                    # FBXファイルをインポート
-                    if file_extension.lower() == '.fbx':
-                        bpy.ops.import_scene.fbx(filepath=filename)
+        #             # FBXファイルをインポート
+        #             if file_extension.lower() == '.fbx':
+        #                 bpy.ops.import_scene.fbx(filepath=filename)
 
-                    # GLBファイルをインポート
-                    elif file_extension.lower() == '.glb':
-                        bpy.ops.import_scene.gltf(filepath=filename)
+        #             # GLBファイルをインポート
+        #             elif file_extension.lower() == '.glb':
+        #                 bpy.ops.import_scene.gltf(filepath=filename)
 
-        # クリップボードを閉じる
-        win32clipboard.CloseClipboard()
+        # # クリップボードを閉じる
+        # win32clipboard.CloseClipboard()
         
+        import ctypes
+        import struct
+
+        from io import BytesIO
+
+        from ctypes.wintypes import BOOL, HWND, HANDLE, HGLOBAL, UINT, LPVOID
+        from ctypes import c_size_t as SIZE_T
+
+        OpenClipboard = ctypes.windll.user32.OpenClipboard
+        OpenClipboard.argtypes = HWND,
+        OpenClipboard.restype = BOOL
+        EmptyClipboard = ctypes.windll.user32.EmptyClipboard
+        EmptyClipboard.restype = BOOL
+        GetClipboardData = ctypes.windll.user32.GetClipboardData
+        GetClipboardData.argtypes = UINT,
+        GetClipboardData.restype = HANDLE
+        SetClipboardData = ctypes.windll.user32.SetClipboardData
+        SetClipboardData.argtypes = UINT, HANDLE
+        SetClipboardData.restype = HANDLE
+        CloseClipboard = ctypes.windll.user32.CloseClipboard
+        CloseClipboard.restype = BOOL
+        IsClipboardFormatAvailable = ctypes.windll.user32.IsClipboardFormatAvailable
+        IsClipboardFormatAvailable.argtypes = UINT,
+        IsClipboardFormatAvailable.restype = BOOL
+        CF_UNICODETEXT = 13
+        CF_DIB = 8
+        CF_HDROP = 15
+
+        GlobalAlloc = ctypes.windll.kernel32.GlobalAlloc
+        GlobalAlloc.argtypes = UINT, SIZE_T
+        GlobalAlloc.restype = HGLOBAL
+        GlobalLock = ctypes.windll.kernel32.GlobalLock
+        GlobalLock.argtypes = HGLOBAL,
+        GlobalLock.restype = LPVOID
+        GlobalUnlock = ctypes.windll.kernel32.GlobalUnlock
+        GlobalUnlock.argtypes = HGLOBAL,
+        GlobalSize = ctypes.windll.kernel32.GlobalSize
+        GlobalSize.argtypes = HGLOBAL,
+        GlobalSize.restype = SIZE_T
+        GMEM_MOVEABLE = 0x0002
+        GMEM_ZEROINIT = 0x0040
+        GMEM_SHARE    = 0x2000
+        GHND = GMEM_MOVEABLE | GMEM_ZEROINIT
+
+        unicode_type = type(u'')
+
+        def read_raw(fmt):
+            handle = GetClipboardData(fmt)
+            pcontents = GlobalLock(handle)
+            size = GlobalSize(handle)
+            raw_string = None
+            if pcontents and size:
+                raw_data = ctypes.create_string_buffer(size)
+                ctypes.memmove(raw_data, pcontents, size)
+                raw_string = raw_data.raw
+            GlobalUnlock(handle)
+            return raw_string
+            
+        def get():
+            text = None
+            OpenClipboard(None)
+            if IsClipboardFormatAvailable(CF_DIB):
+                CloseClipboard()
+                # from http://stackoverflow.com/a/7045677
+                from PIL import ImageGrab
+                return ImageGrab.grabclipboard()
+            if IsClipboardFormatAvailable(CF_HDROP):
+                raw_string = read_raw(CF_HDROP)
+                CloseClipboard()
+                pFiles, pt_x, pt_y, fNC, fWide = struct.unpack('IIIII', raw_string[:20])
+                cooked = raw_string[pFiles:].decode('utf-16' if fWide else 'mbcs')
+                return [name for name in cooked.split(u'\0') if name]
+            handle = GetClipboardData(CF_UNICODETEXT)
+            pcontents = GlobalLock(handle)
+            size = GlobalSize(handle)
+            if pcontents and size:
+                raw_data = ctypes.create_string_buffer(size)
+                ctypes.memmove(raw_data, pcontents, size)
+                text = raw_data.raw.decode('utf-16le').rstrip(u'\0')
+            GlobalUnlock(handle)
+            CloseClipboard()
+            return text
+
+
+        def create_collection(collection_name):
+            # ルートコレクションを取得
+            root_collection = bpy.context.scene.collection
+
+            # すでに同じ名前のコレクションが存在する場合は作成しない
+            # if collection_name in bpy.data.collections:
+            #     print(f"コレクション '{collection_name}' はすでに存在します。")
+            #     return
+
+            # 新しいコレクションを作成
+            new_collection = bpy.data.collections.new(collection_name)
+
+            # ルートコレクションに追加
+            root_collection.children.link(new_collection)
+            
+
+            print(f"コレクション '{new_collection.name}' を作成しました。")
+            return new_collection.name
+
+
+        def move_obj(collection_name,objs):
+            target_col = bpy.data.collections[collection_name]
+            for obj in objs:
+                for col in obj.users_collection:
+                    # print(col)
+                    # Unlink the object
+                    col.objects.unlink(obj)
+
+                target_col.objects.link(obj)
+
+ 
+
+        file_paths = get()
+        # if file_paths:
+        #     print("Copied file paths:")
+        #     for path in file_paths:
+        #         print(path)
+        # else:
+        #     print("No file paths found on the clipboard.")
+
+        for filename in file_paths:
+            if filename:  # ファイル名が空でない場合のみ処理
+                # ファイル拡張子を正しく表示
+                # ファイル名から拡張子を取得
+
+                base_filename, file_extension = os.path.splitext(filename)
+                filename_bace = os.path.basename(filename)
+                name_without_extension = os.path.splitext(filename_bace)[0]
+
+                # FBXファイルをインポート
+                if file_extension.lower() == '.fbx':
+                    # コレクションを作成
+
+                    bpy.ops.import_scene.fbx(filepath=filename)
+                    collection_name=create_collection(name_without_extension)
+                    move_obj(collection_name,bpy.context.selected_objects)
+                    
+
+                # GLBファイルをインポート
+                elif file_extension.lower() == '.glb':
+                    collection_name=create_collection(name_without_extension)
+                    bpy.ops.import_scene.gltf(filepath=filename)
+                    move_obj(collection_name,bpy.context.selected_objects)
+
+                # OBJファイルをインポート
+                elif file_extension.lower() == '.obj':
+                    collection_name=create_collection(name_without_extension)
+                    bpy.ops.import_scene.obj(filepath=filename)
+                    move_obj(collection_name,bpy.context.selected_objects)
+
+
         return {'FINISHED'}
 
 
 
+class GetFacebySide(bpy.types.Operator):
+    bl_idname = "ksyn.get_face_by_side"
+    bl_label = "Get Face By_side"
+    bl_options = {'REGISTER', 'UNDO'}
+    
+    # name: bpy.props.StringProperty(name="New Name") # type: ignore
+    # label: bpy.props.StringProperty(name="New Label") # type: ignore # type: ignore
+    # same_name_label: bpy.props.BoolProperty(name="Same as Name", default=True) # type: ignore
+    number :bpy.props.IntProperty(name="Face Number", default=3) # type: ignore
+    # def invoke(self, context, event):
+    #     return context.window_manager.invoke_props_dialog(self)
+    
+    def execute(self, context):
+        bpy.ops.mesh.select_face_by_sides(number=self.number)
+    
+        return {'FINISHED'}
+    
 class RenameActiveNodeOperator(bpy.types.Operator):
     bl_idname = "object.rename_active_node"
     bl_label = "Rename Active Node"
