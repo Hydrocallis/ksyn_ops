@@ -123,7 +123,7 @@ class OBJECTEASYMIRROR(bpy.types.Operator):
     lastselected: bpy.props.BoolProperty(
         name="Last Selection Basis",
         default=False,
-        )
+        ) # type: ignore
     
 
     axis:bpy.props.BoolVectorProperty(
@@ -131,7 +131,7 @@ class OBJECTEASYMIRROR(bpy.types.Operator):
         description='', 
         default=(True, False, False),
         subtype="XYZ"
-        )
+        ) # type: ignore
     
 
     def draw(self, context):

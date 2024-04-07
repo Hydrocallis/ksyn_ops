@@ -34,6 +34,8 @@ class_paths = [
     ("operators", "pie_op", "wiredisplay"),
     ("operators", "boolobject", "BoolOnOff"),
     ("operators", "boolobject", "SelectObjectBool"),
+    ("operators", "boolobject", "OBJECT_OT_boolean_targets_enum"),
+    ("operators", "boolobject", "OBJECT_PT_BooleanObjectsPanel"),
     ("operators", "ciercle_dupulicate_ot", "ciercle_dupulicate"),
     ("operators", "cleanupinstans", "cleanupinstans"),
     ("operators", "copyasset", "CopyAsset"),
