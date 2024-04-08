@@ -24,36 +24,72 @@ def get_translang(eng,trans):
         return trans
     else:
         return eng
+    
+def ShowMessageBox(message:list = [], title = "Message Box", icon = 'INFO'):
+
+    def draw(self, context):
+
+        for mes in message:
+            self.layout.label(text=mes)
+
+    bpy.context.window_manager.popup_menu(draw, title = title, icon = icon)
 
 class OBJECT_OT_boolean_targets_enum(bpy.types.Operator):
     bl_idname = "object.boolean_targets_enum"
     bl_label = "Boolean Targets Enum"
-#    bl_options = {'REGISTER', 'UNDO'}
+    bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
 
     cmd: bpy.props.StringProperty(default="", options={'HIDDEN'}) # type: ignore
 
-#    bool: bpy.props.BoolProperty(
-#        name="show autocomplete Status",
-#        default=True,
-#        options={'HIDDEN'}
-#    ) # type: ignore
+    def collection_exculude_hide(self, colename="BOOL"):
+        # #Recursivly transverse layer_collection for a particular name
+        def recurLayerCollection(layerColl, collName):
+            found = None
+            if (layerColl.name == collName):
+                return layerColl
+            for layer in layerColl.children:
+                found = recurLayerCollection(layer, collName)
+                if found:
+                    return found
 
+        #Change the Active LayerCollection to 'My Collection'
+        layer_collection = bpy.context.view_layer.layer_collection
+        layerColl = recurLayerCollection(layer_collection, colename)
+        if not layerColl==None:
+
+            bpy.context.view_layer.active_layer_collection = layerColl
+            layerColl.exclude = False
+            layerColl.hide_viewport = False
+            return layerColl
+        else:
+            return None
 
     def draw(self, context):
         layout = self.layout
-#        layout.prop(self, "cmd", expand=True, text="")
-#        layout.prop(self, "bool")
+
 
     def execute(self, context):
         tuple_from_str = tuple(eval(self.cmd))
         if tuple_from_str[0] =="apply":
             bpy.ops.object.modifier_apply(modifier=tuple_from_str[1])
-            print("hello")
+        elif tuple_from_str[0] =="bool_viewport":
+            if bpy.context.object.modifiers[tuple_from_str[1]].show_viewport:
+                bpy.context.object.modifiers[tuple_from_str[1]].show_viewport = False
+            else:
+                bpy.context.object.modifiers[tuple_from_str[1]].show_viewport = True
+
         else:
             
-
-            print("Selected Boolean Target:", self.cmd)
-            bpy.data.objects[tuple_from_str[0]].hide_viewport =tuple_from_str[1]
+            # print("Selected Boolean Target:", self.cmd)
+            try:
+                bpy.data.objects[tuple_from_str[0]].hide_set(tuple_from_str[1])
+            except RuntimeError:
+                layerColl = self.collection_exculude_hide(colename="BOOL")
+                if not layerColl==None:
+                    bpy.data.objects[tuple_from_str[0]].hide_set(tuple_from_str[1])
+                else:
+                    ShowMessageBox(message=["Not found BOOl collection"], title = "Message Box", icon = 'INFO')
+                    pass
 
         return {'FINISHED'}
 
@@ -64,6 +100,8 @@ class OBJECT_PT_BooleanObjectsPanel(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = "KSYN"
+    bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
+
 
 
     def get_boolean_modifier_targets(self,obj):
@@ -82,16 +120,26 @@ class OBJECT_PT_BooleanObjectsPanel(bpy.types.Panel):
             for boolean_obj,modifier_name in target_objects:
                 if  boolean_obj:
 #                    print(modifier_name)
-                    layout.label(text="- " + boolean_obj.name)
-                    if boolean_obj.hide_viewport:
-                        reslut=False
+                    if boolean_obj.hide_get():
+                        obj_hide_reslut = False
                     else:
-                        reslut =True
-                    grid = layout.grid_flow(row_major=True, columns=3, even_columns=True, even_rows=True, align=True)
-               
-                    grid.operator("object.boolean_targets_enum",depress =reslut,text="Show" if reslut else "Hide").cmd =str((boolean_obj.name, reslut))
-                    grid.operator("object.boolean_targets_enum",text="",icon="CHECKMARK").cmd =str(("apply", modifier_name))
+                        obj_hide_reslut = True
+                    # print("###b",bpy.context.object)
+                    try:
+                        if bpy.context.object.modifiers[modifier_name].show_viewport:
+                            bool_modifire_viewport_reslut=True
+                        else:
+                            bool_modifire_viewport_reslut=False
 
+                        grid = layout.grid_flow(row_major=True, columns=4, even_columns=True, even_rows=True, align=True)
+                
+                        grid.label(text="- " + boolean_obj.name)
+                        grid.operator("object.boolean_targets_enum",depress = obj_hide_reslut, icon=f"HIDE_OFF" if obj_hide_reslut else f"HIDE_ON").cmd =str((boolean_obj.name, obj_hide_reslut))
+                        # grid.operator("object.boolean_targets_enum",depress =reslut,text=f"Show" if reslut else f"Hide").cmd =str(("bool_viewport", modifier_name))
+                        grid.operator("object.boolean_targets_enum",text="", icon="RESTRICT_VIEW_OFF" ,depress =bool_modifire_viewport_reslut ).cmd =str(("bool_viewport", modifier_name))
+                        grid.operator("object.boolean_targets_enum",text="",icon="CHECKMARK").cmd =str(("apply", modifier_name))
+                    except KeyError:
+                        pass
 class BoolOnOff(Operator):
     bl_idname = "object.boolonoff_operator"
     bl_label = "ブール用ワイヤーON/OFF"
@@ -160,14 +208,6 @@ class SelectObjectBool(Operator):
 
     booleanname='ksynbooly'
 
-    def ShowMessageBox(self,message = "", title = "Message Box", icon = 'INFO'):
-
-        def draw(self, context):
-
-            for mes in message:
-                self.layout.label(text=mes)
-
-        bpy.context.window_manager.popup_menu(draw, title = title, icon = icon)
 
 
     def get_and_apply_mod(self,mod,obj,message_poplist,prev_name):
@@ -392,7 +432,7 @@ class SelectObjectBool(Operator):
             
             if message_poplist==[]:
                 message_poplist=["none object"]
-            self.ShowMessageBox(message= message_poplist)
+            ShowMessageBox(message= message_poplist)
             bpy.context.scene["boolean_applay_list"]=message_poplist
             
         else:
