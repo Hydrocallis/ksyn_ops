@@ -34,9 +34,10 @@ def ShowMessageBox(message:list = [], title = "Message Box", icon = 'INFO'):
 
     bpy.context.window_manager.popup_menu(draw, title = title, icon = icon)
 
+# パネル用のオペレーター
 class OBJECT_OT_boolean_targets_enum(bpy.types.Operator):
     bl_idname = "object.boolean_targets_enum"
-    bl_label = "Boolean Targets Enum"
+    bl_label = get_translang("Boolean Targets","ブーリアン・ターゲット")
     bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
 
     cmd: bpy.props.StringProperty(default="", options={'HIDDEN'}) # type: ignore
@@ -119,6 +120,9 @@ class OBJECT_PT_BooleanObjectsPanel(bpy.types.Panel):
     
     def draw(self, context):
         layout = self.layout
+        layout.operator("object.selectobjectbool_operator").cmd = "simpleboolean"
+        layout.operator("object.selectobjectbool_operator",text=get_translang('Appy Boolean','ブーリアン適応')).cmd = "applyboolean"
+        layout.operator("object.boolonoff_operator")
         selected_objects = bpy.context.selected_objects
 
         for obj in selected_objects:
@@ -150,7 +154,7 @@ class OBJECT_PT_BooleanObjectsPanel(bpy.types.Panel):
 
 class BoolOnOff(Operator):
     bl_idname = "object.boolonoff_operator"
-    bl_label = "ブール用ワイヤーON/OFF"
+    bl_label = get_translang("Wire for boule ON/OFF","ブール用ワイヤーON/OFF")
     bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
     bl_options = {'REGISTER', 'UNDO'}
 
@@ -171,12 +175,11 @@ class BoolOnOff(Operator):
 
         return {'FINISHED'}
 
-
 class SelectObjectBool(Operator):
     bl_idname = "object.selectobjectbool_operator"
     bl_label = "Simple Boolean"
     bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = {'REGISTER', 'UNDO', 'PRESET'}
 
     options = [
         ('DIFFERENCE', 'Difference', 'Difference'),
@@ -217,9 +220,15 @@ class SelectObjectBool(Operator):
                                     default=True,
                                     ) # type: ignore
 
-    sline_Intersect_vector: bpy.props.FloatVectorProperty(default =(1,1,1) 
+    sline_Intersect_vector: bpy.props.FloatVectorProperty(default =(1,1,1),
+                                                          subtype="XYZ"
 
-    )# type: ignore
+        )# type: ignore
+    
+    sline_Intersect_location_vector: bpy.props.FloatVectorProperty(default =(0,0,0),
+                                                                   subtype="XYZ_LENGTH" 
+
+        )# type: ignore
 
     booleanname='ksynbooly'
 
@@ -387,8 +396,20 @@ class SelectObjectBool(Operator):
                 self.collectionmove(activeob)
             else:
                 self.wireon(activeob)
-            
+
+    def slice_object_transform(self):
+        bpy.context.object.scale = (
+            bpy.context.object.scale[0]*self.sline_Intersect_vector[0],
+            bpy.context.object.scale[1]*self.sline_Intersect_vector[1],
+            bpy.context.object.scale[2]*self.sline_Intersect_vector[2],
+            )
+        bpy.context.object.location = (
+            bpy.context.object.location[0]+self.sline_Intersect_location_vector[0],
+            bpy.context.object.location[1]+self.sline_Intersect_location_vector[1],
+            bpy.context.object.location[2]+self.sline_Intersect_location_vector[2],
+            )
  
+
     def slile_obj(self,operation_enum,activeob,obs,add_tryi):
         if operation_enum=="SLICE":
             activeob.select_set(False)
@@ -414,18 +435,12 @@ class SelectObjectBool(Operator):
 
                     
                 activeob.select_set(True)
-                
-                
+
                 bpy.ops.object.duplicate_move()
 
-        
                 self.selected_single_bool_first(selfobj,bpy.context.object,operation_enum,add_tryi,slice_op=slice_op)
-
-                bpy.context.object.scale = (
-                    bpy.context.object.scale[0]*self.sline_Intersect_vector[0],
-                    bpy.context.object.scale[1]*self.sline_Intersect_vector[1],
-                    bpy.context.object.scale[2]*self.sline_Intersect_vector[2],
-                    )
+                self.slice_object_transform()
+                
                 slice_op=False
                 
 
@@ -478,7 +493,9 @@ class SelectObjectBool(Operator):
                 self.layout.prop_enum(self, "operation_enum", "SLICE")        
                 if self.operation_enum == "SLICE":
                     self.layout.prop(self,"sline_Intersect_bool")
-                    self.layout.prop(self,"sline_Intersect_vector")
+                    if self.sline_Intersect_bool:
+                        self.layout.prop(self,"sline_Intersect_vector")
+                        self.layout.prop(self,"sline_Intersect_location_vector")
             self.layout.prop(self,"add_tryi_bool")
 
     def execute(self, context):
