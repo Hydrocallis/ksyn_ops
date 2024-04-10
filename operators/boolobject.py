@@ -67,11 +67,18 @@ class OBJECT_OT_boolean_targets_enum(bpy.types.Operator):
     def draw(self, context):
         layout = self.layout
 
-
     def execute(self, context):
         tuple_from_str = tuple(eval(self.cmd))
         if tuple_from_str[0] =="apply":
+            active_object=bpy.context.object
+            # print("###bpy.data.objects[tuple_from_str[2]]",bpy.data.objects[tuple_from_str[2]])
+            bpy.context.view_layer.objects.active = bpy.data.objects[tuple_from_str[2]]
+            bpy.context.object.select_set(True)
             bpy.ops.object.modifier_apply(modifier=tuple_from_str[1])
+            # bpy.context.object.select_set(False)
+            bpy.context.view_layer.objects.active = active_object
+
+
         elif tuple_from_str[0] =="bool_viewport":
             if bpy.context.object.modifiers[tuple_from_str[1]].show_viewport:
                 bpy.context.object.modifiers[tuple_from_str[1]].show_viewport = False
@@ -134,18 +141,18 @@ class OBJECT_PT_BooleanObjectsPanel(bpy.types.Panel):
                         grid = layout.grid_flow(row_major=True, columns=4, even_columns=True, even_rows=True, align=True)
                 
                         grid.label(text="- " + boolean_obj.name)
-                        grid.operator("object.boolean_targets_enum",depress = obj_hide_reslut, icon=f"HIDE_OFF" if obj_hide_reslut else f"HIDE_ON").cmd =str((boolean_obj.name, obj_hide_reslut))
+                        grid.operator("object.boolean_targets_enum",depress = obj_hide_reslut, icon=f"HIDE_OFF" if obj_hide_reslut else f"HIDE_ON",text="").cmd =str((boolean_obj.name, obj_hide_reslut))
                         # grid.operator("object.boolean_targets_enum",depress =reslut,text=f"Show" if reslut else f"Hide").cmd =str(("bool_viewport", modifier_name))
                         grid.operator("object.boolean_targets_enum",text="", icon="RESTRICT_VIEW_OFF" ,depress =bool_modifire_viewport_reslut ).cmd =str(("bool_viewport", modifier_name))
-                        grid.operator("object.boolean_targets_enum",text="",icon="CHECKMARK").cmd =str(("apply", modifier_name))
+                        grid.operator("object.boolean_targets_enum",text="",icon="CHECKMARK").cmd =str(("apply", modifier_name,obj.name))
                     except KeyError:
                         pass
+
 class BoolOnOff(Operator):
     bl_idname = "object.boolonoff_operator"
     bl_label = "ブール用ワイヤーON/OFF"
     bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
     bl_options = {'REGISTER', 'UNDO'}
-
 
 
 
@@ -204,7 +211,15 @@ class SelectObjectBool(Operator):
                                     name=get_translang('Triangulation modifier added','三角化モディファイア追加'),
                                     default=True,
                                     ) # type: ignore
+    
+    sline_Intersect_bool: bpy.props.BoolProperty(
+                                    name=get_translang('Gaps in sliced objects','スライスしたオブジェクトのギャップ'),
+                                    default=True,
+                                    ) # type: ignore
 
+    sline_Intersect_vector: bpy.props.FloatVectorProperty(default =(1,1,1) 
+
+    )# type: ignore
 
     booleanname='ksynbooly'
 
@@ -324,7 +339,6 @@ class SelectObjectBool(Operator):
                 bool.operation = operation_enum
             bool.solver = 'FAST'
 
-
             
             # アクティブオブジェクト以外をブールフォルダに移動する。（既存のコレクションはアンリンク）
             if bpy.context.view_layer.objects.active != sel_obj:
@@ -337,13 +351,19 @@ class SelectObjectBool(Operator):
 
         #　最後に選択したオブジェクトにペアレントするかどうか。
         if parent_bool == True:
-            bpy.ops.object.parent_set(type='OBJECT', keep_transform=True)
+            try:
+                bpy.ops.object.parent_set(type='OBJECT', keep_transform=True)
+            except RuntimeError:
+                bpy.context.scene["boolean_Status"]="Roop"
+                print("roop")
+            
         else:
             pass
-    # 選択したオブジェクトにアクティブなオブジェクトのブールをかける
-    def selected_single_bool(self, obs,activeob,operation_enum,add_tryi):
 
-    
+
+
+
+    def selected_single_bool_first(self,obs,activeob,operation_enum,add_tryi,slice_op=False):
         for sel_obj in obs:
                     # アクティブなオブジェクトにブールモディファイアを適応
             bool = sel_obj.modifiers.new(name=self.booleanname, type='BOOLEAN')
@@ -352,8 +372,12 @@ class SelectObjectBool(Operator):
             bool.object = activeob
             if operation_enum=="SLICE":
                 bool.operation = "DIFFERENCE"
+ 
             else:
                 bool.operation = operation_enum
+
+            if slice_op==True:
+                bool.operation = "INTERSECT"
 
             bool.solver = 'FAST'
             self.add_triangul(add_tryi, sel_obj)
@@ -364,14 +388,16 @@ class SelectObjectBool(Operator):
             else:
                 self.wireon(activeob)
             
-
-
+ 
+    def slile_obj(self,operation_enum,activeob,obs,add_tryi):
         if operation_enum=="SLICE":
             activeob.select_set(False)
 
             bpy.ops.object.duplicate_move()
 
-            for sel_obj in bpy.context.selected_objects:
+            selfobj=bpy.context.selected_objects
+
+            for sel_obj in selfobj:
                 obs.append(sel_obj)
                 if add_tryi:
                     bool = sel_obj.modifiers[-2]
@@ -380,7 +406,36 @@ class SelectObjectBool(Operator):
 
                 bool.operation = "INTERSECT"
 
-        # print("###list",obs)
+
+            if self.sline_Intersect_bool:
+                slice_op=True
+                for obj in bpy.context.selected_objects:
+                    obj.select_set(False)
+
+                    
+                activeob.select_set(True)
+                
+                
+                bpy.ops.object.duplicate_move()
+
+        
+                self.selected_single_bool_first(selfobj,bpy.context.object,operation_enum,add_tryi,slice_op=slice_op)
+
+                bpy.context.object.scale = (
+                    bpy.context.object.scale[0]*self.sline_Intersect_vector[0],
+                    bpy.context.object.scale[1]*self.sline_Intersect_vector[1],
+                    bpy.context.object.scale[2]*self.sline_Intersect_vector[2],
+                    )
+                slice_op=False
+                
+
+    # slice機能の時はこの関数を使用
+    # 選択したオブジェクトにアクティブなオブジェクトのブールをかける
+    def selected_single_bool(self, obs,activeob,operation_enum,add_tryi):
+
+        self.selected_single_bool_first(obs,activeob,operation_enum,add_tryi)
+        self.slile_obj(operation_enum,activeob,obs,add_tryi)
+       
 
     def main(self, selected_mulch_bool, parent_bool,operation_enum,add_tryi):
 
@@ -421,7 +476,9 @@ class SelectObjectBool(Operator):
             
             if not self.selected_mulch_bool:
                 self.layout.prop_enum(self, "operation_enum", "SLICE")        
-
+                if self.operation_enum == "SLICE":
+                    self.layout.prop(self,"sline_Intersect_bool")
+                    self.layout.prop(self,"sline_Intersect_vector")
             self.layout.prop(self,"add_tryi_bool")
 
     def execute(self, context):
