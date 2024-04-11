@@ -36,7 +36,7 @@ class ViewShading(Operator):
         items=test_items,
         name='タイプ',
 
-        )
+        ) # type: ignore
 
     def execute(self, context):
         if self.material_enum == "1":
@@ -74,16 +74,16 @@ class ViewShading(Operator):
 
 
 
-class ViewShadingShowFace(Operator):
-    """Tooltip"""
-    bl_idname = "object.viewshadingshowface_operator"
-    bl_label = "フェイスの裏表切り替え"
-    bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
+# class ViewShadingShowFace(Operator):
+#     """Tooltip"""
+#     bl_idname = "object.viewshadingshowface_operator"
+#     bl_label = "フェイスの裏表切り替え"
+#     bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
 
-    def execute(self, context):
-        if  context.space_data.overlay.show_face_orientation == True:
-            context.space_data.overlay.show_face_orientation = False
-        else:
-             context.space_data.overlay.show_face_orientation = True
+#     def execute(self, context):
+#         if  context.space_data.overlay.show_face_orientation == True:
+#             context.space_data.overlay.show_face_orientation = False
+#         else:
+#              context.space_data.overlay.show_face_orientation = True
 
-        return {'FINISHED'}
+#         return {'FINISHED'}

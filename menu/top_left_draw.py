@@ -8,7 +8,9 @@ def top_left_draw(self):
     gap = box.column()
     gap.separator()
     gap.scale_y = -10
+    row = box.row(align=True)   
+    row.operator("wm.save_mainfile", text="Save", icon='FILE_TICK')
+    row.operator("wm.save_as_mainfile", text="Save As...")
+    row = box.row(align=True)
 
-    box.operator("wm.save_mainfile", text="Save", icon='FILE_TICK')
-    box.operator("wm.save_as_mainfile", text="Save As...")
-    box.operator("ksyn_ops.setting_operator")
+    row.operator("ksyn_ops.setting_operator")

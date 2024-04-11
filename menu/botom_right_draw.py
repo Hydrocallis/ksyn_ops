@@ -19,7 +19,7 @@ def botom_right_draw(self):
         other = pie.column()
         gap = other.column()
         gap.separator()
-        gap.scale_y = 30
+        gap.scale_y = 50
         other_menu = other.box().column()
         other_menu.scale_y=1.3
 

@@ -61,7 +61,7 @@ class_paths = [
     ("operators", "PiePropsSetting", "PiePropsSetting"),
     ("operators", "select_mesh_separate_operator", "select_mesh_separate_operator"),
     ("operators", "shadingchange", "ViewShading"),
-    ("operators", "shadingchange", "ViewShadingShowFace"),
+    # ("operators", "shadingchange", "ViewShadingShowFace"),
     ("operators", "simplerotate", "simplerotate"),
     ("operators", "uv_map_deletechange", "UvMapDeleteChange"),
     ("operators", "uv_selmirseam", "uvsettingselmirseam"),

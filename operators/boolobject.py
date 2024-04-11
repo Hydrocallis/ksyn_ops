@@ -194,7 +194,7 @@ class SelectObjectBool(Operator):
         description=""
         ) # type: ignore
     
-    cmd: bpy.props.StringProperty(default="", options={'HIDDEN'}) # type: ignore
+    cmd: bpy.props.StringProperty(default="simpleboolean", options={'HIDDEN'}) # type: ignore
 
     
     parent_bool: bpy.props.BoolProperty(
@@ -499,6 +499,8 @@ class SelectObjectBool(Operator):
             self.layout.prop(self,"add_tryi_bool")
 
     def execute(self, context):
+        save_act_obj = bpy.context.view_layer.objects.active 
+
         if self.cmd =="applyboolean":
             message_poplist=[]
             for obj in bpy.context.selected_objects:
@@ -511,7 +513,7 @@ class SelectObjectBool(Operator):
             
         else:
             self.main(self.selected_mulch_bool, self.parent_bool,self.operation_enum,self.add_tryi_bool)
-    
+        save_act_obj.select_set(True)
         return {'FINISHED'}
     def draw(self, context):
         

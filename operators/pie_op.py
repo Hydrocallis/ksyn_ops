@@ -1,4 +1,4 @@
-import bpy,sys,inspect
+import bpy,sys,os,inspect
 
 from bpy.types import (
         Operator,
@@ -18,60 +18,19 @@ except ImportError:
     from ksyn_ops.utils.operators_utils import description # type: ignore
     from ksyn_ops.utils.get_translang import get_translang # type: ignore
 
-
 from mathutils import Matrix
 from math import radians
 import pathlib
 from bpy.props import FloatProperty
 
-import bpy
-try:
-    import win32clipboard
-except ModuleNotFoundError:
-    pass
-    # print('### please install python module win32')
-import os
-
-
-
 
 class ImportFBXFromClipboardOperator(bpy.types.Operator):
     bl_idname = "wm.import_3dfile_from_clipboard"
     bl_label = get_translang("Import FBX GLB from Clipboard","クリップボードからFBX GLBインポート")
+    bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
     
     def execute(self, context):
-        # # クリップボードを開く
-        # win32clipboard.OpenClipboard()
-
-        # # FileName形式のクリップボードデータを取得
-        # filename_format = win32clipboard.RegisterClipboardFormat('FileNameW')
-        # if win32clipboard.IsClipboardFormatAvailable(filename_format):
-        #     input_filenames = win32clipboard.GetClipboardData(filename_format)
-        #     print("###input_filenames",input_filenames)
-
-        #     # バイト列をUTF-16でデコード
-        #     input_filenames = input_filenames.decode('utf-16', errors='ignore')
-
-        #     # ファイル名はNULL文字で区切られているので、それを基に分割
-        #     filenames = input_filenames.split('\x00')
-
-        #     for filename in filenames:
-        #         if filename:  # ファイル名が空でない場合のみ処理
-        #             # ファイル拡張子を正しく表示
-        #             # ファイル名から拡張子を取得
-        #             base_filename, file_extension = os.path.splitext(filename)
-
-        #             # FBXファイルをインポート
-        #             if file_extension.lower() == '.fbx':
-        #                 bpy.ops.import_scene.fbx(filepath=filename)
-
-        #             # GLBファイルをインポート
-        #             elif file_extension.lower() == '.glb':
-        #                 bpy.ops.import_scene.gltf(filepath=filename)
-
-        # # クリップボードを閉じる
-        # win32clipboard.CloseClipboard()
-        
+       
         import ctypes
         import struct
 
@@ -229,12 +188,11 @@ class ImportFBXFromClipboardOperator(bpy.types.Operator):
 
         return {'FINISHED'}
 
-
-
 class GetFacebySide(bpy.types.Operator):
     bl_idname = "ksyn.get_face_by_side"
     bl_label = "Get Face By_side"
     bl_options = {'REGISTER', 'UNDO'}
+    bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
     
     # name: bpy.props.StringProperty(name="New Name") # type: ignore
     # label: bpy.props.StringProperty(name="New Label") # type: ignore # type: ignore
@@ -242,9 +200,22 @@ class GetFacebySide(bpy.types.Operator):
     number :bpy.props.IntProperty(name="Face Number", default=3) # type: ignore
     # def invoke(self, context, event):
     #     return context.window_manager.invoke_props_dialog(self)
+    compare_options = [
+        ('LESS', 'Less', 'Select faces with sides less than threshold'),
+        ('EQUAL', 'Equal', 'Select faces with area equal to threshold'),
+        ('GREATER', 'Greater', 'Select faces with sides greater than threshold'),
+        ('NOTEQUAL', 'Not Equal', 'Select faces with sides not equal to threshold')
+    ]
+    
+    compare_type : bpy.props.EnumProperty(
+        items=compare_options,
+        name="Compare Type",
+        description="Select the type of comparison",
+        default='LESS'
+        ) # type: ignore
     
     def execute(self, context):
-        bpy.ops.mesh.select_face_by_sides(number=self.number)
+        bpy.ops.mesh.select_face_by_sides(number=self.number, type=self.compare_type)
     
         return {'FINISHED'}
     
@@ -252,6 +223,7 @@ class RenameActiveNodeOperator(bpy.types.Operator):
     bl_idname = "object.rename_active_node"
     bl_label = "Rename Active Node"
     bl_options = {'REGISTER', 'UNDO'}
+    bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
     
     name: bpy.props.StringProperty(name="New Name") # type: ignore
     label: bpy.props.StringProperty(name="New Label") # type: ignore # type: ignore
@@ -286,6 +258,7 @@ class BevelExtrudeOperator(bpy.types.Operator):
     bl_idname = "mesh.bevel_extrude"
     bl_label = "Bevel and Extrude"
     bl_options = {'REGISTER', 'UNDO'}
+    bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
     
     bevel_amount: FloatProperty(
         name="Bevel Amount",
@@ -326,7 +299,6 @@ class BevelExtrudeOperator(bpy.types.Operator):
         
         return {'FINISHED'}
 
-
 class ChangeLightEnergyOperator(bpy.types.Operator):
     bl_idname = "object.change_light_energy"
     bl_label = "Change Light Energy"
@@ -346,12 +318,11 @@ class ChangeLightEnergyOperator(bpy.types.Operator):
         
         return {'FINISHED'}
 
-
 class MakeRealAndParentOperator(bpy.types.Operator):
     bl_idname = "object.make_real_and_parent"
     bl_label = "Make Real and Parent"
-    bl_description = "Make selected objects real and parent them to an empty"
     bl_options = {'REGISTER', 'UNDO'}
+    bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
     
     create_empty: bpy.props.BoolProperty(
         name="Create Empty",
@@ -398,12 +369,10 @@ class MakeRealAndParentOperator(bpy.types.Operator):
             if self.select_empty:
                 empty.select_set(True)
                 bpy.context.view_layer.objects.active = empty
-
             
         
         return {'FINISHED'}
     
-
 class ImportNodeGroupsOperator(Operator):
     bl_idname = "object.import_node_groups"
     bl_label = "Import Node Groups"
@@ -421,8 +390,10 @@ class ImportNodeGroupsOperator(Operator):
             ('Rotation_Array', 'Rotation Array', 'Rotation Array '),
         ]
         ) # type: ignore
-
     
+    def invoke(self, context, event):
+        return context.window_manager.invoke_props_dialog(self)
+        
     def execute(self, context):
         p_file = pathlib.Path(__file__)
         filepath=  str(p_file.parents[1].joinpath("asset", 'ksyn_nodes.blend'))
@@ -449,7 +420,6 @@ class ImportNodeGroupsOperator(Operator):
         modifier.node_group = node_group
         
         return {'FINISHED'}
-
 
 class ReName(Operator):
     bl_idname = "ksyn.renameop"
@@ -515,9 +485,8 @@ class ReName(Operator):
 
         return {'FINISHED'}
 
-
 class AutoSommth(Operator):
-    bl_idname = "object.pie10_operator"
+    bl_idname = "object.ksynautosommth_operator"
     bl_label = "スムーズ"
     bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
     bl_options = {'REGISTER', 'UNDO', 'PRESET'}
@@ -578,6 +547,7 @@ class toggle_mode(Operator):
     bl_idname = "object.toggle_mode"
     bl_label = "Toggle Mode"
     bl_options = {'REGISTER', 'UNDO', 'PRESET'}
+    bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
 
     
     mode_options = [
@@ -601,7 +571,6 @@ class toggle_mode(Operator):
             bpy.ops.object.mode_set(mode="SCULPT")
         
         return {'FINISHED'}
-
 
 class rotationx(Operator):
     bl_idname = "object.pie8_operator"
@@ -661,6 +630,7 @@ class ColorPickupObject(Operator):
     """Tooltip"""
     bl_idname = "object.colorpickup_object"
     bl_label = "ColorPickupObject"
+    bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
 
   
     def execute(self, context):
@@ -675,6 +645,8 @@ class SubdivisionShow(Operator):
     """Tooltip"""
     bl_idname = "object.subdivision_show"
     bl_label = "subdivision_show"
+    bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
+
 
     @classmethod
     def poll(cls, context):
@@ -704,6 +676,7 @@ class AmatureRestBool(Operator):
     """Tooltip"""
     bl_idname = "object.amaturerestbool"
     bl_label = "amaturerestbool"
+    bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
 
     @classmethod
     def poll(cls, context):
@@ -732,8 +705,8 @@ class AmatureRestBool(Operator):
 class PLockTransforms(Operator):
     bl_idname = "object.locktransforms"
     bl_label = "Lock Object Transforms"
-    bl_description = ("Enable or disable the editing of objects transforms in the 3D View\n"
-                     "Needs an existing Active Object")
+    bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
+
     bl_options = {'REGISTER', 'UNDO'}
 
     @classmethod
