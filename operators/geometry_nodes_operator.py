@@ -52,38 +52,40 @@ class GeometryNodesOperator(bpy.types.Operator):
         items=lambda self, context: [(s.name, s.name, s.name) for s in bpy.data.scenes],
         name="Scene",
         description="Select a scene"
-    )
+    ) # type: ignore
 
     hide_children: bpy.props.BoolProperty(
         name="Hide Children",
         default=False
-    )
+    ) # type: ignore
 
     wire_children: bpy.props.BoolProperty(
         name="Wire Children",
         default=False
-    )
+    ) # type: ignore
     
     use_collection: bpy.props.BoolProperty(
         name="Use Collection",
         default=False
-    )
+    ) # type: ignore
 
     location_cursor : bpy.props.BoolProperty(
         name="Location to the cursor",
         description="Location to the cursor",
         default=False
-    )
+    ) # type: ignore
+
     duplicate_to_collection : bpy.props.BoolProperty(
         name="Duplicate to Collection",
         description="Duplicate selected objects to a collection",
         default=True
-    )
-    scene_name: bpy.props.StringProperty(name="Scene Name", default="New Scene")
+    ) # type: ignore
 
-    use_custom_name: bpy.props.BoolProperty(name="Use Custom Scene(Object Copy)", default=False)
+    scene_name: bpy.props.StringProperty(name="Scene Name", default="New Scene") # type: ignore
 
-    select_scene: bpy.props.BoolProperty(name="Select Scene", default=True)
+    use_custom_name: bpy.props.BoolProperty(name="Use Custom Scene(Object Copy)", default=False) # type: ignore
+
+    select_scene: bpy.props.BoolProperty(name="Select Scene", default=True) # type: ignore
 
     def draw(self,context):
         self.layout.label(text="Scene Setting")
@@ -100,18 +102,13 @@ class GeometryNodesOperator(bpy.types.Operator):
         self.layout.prop(self,"hide_children")
         self.layout.prop(self,"wire_children")
         self.layout.prop(self,"location_cursor")
-
         self.layout.label(text="Collection Setting")
-
         self.layout.prop(self,"use_collection")
 
         if self.use_collection:
             self.layout.prop(self,"duplicate_to_collection")
 
-    # @classmethod
-    # def poll(cls, context):
-        # return context.object is not None and context.object.type == 'MESH'
-    
+
 
     def new_scene_copyobj(self):
         if not self.select_scene:

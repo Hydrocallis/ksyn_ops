@@ -25,13 +25,9 @@ import pathlib
 from bpy.props import FloatProperty
 
 import bpy
-try:
-    import win32clipboard
-except ModuleNotFoundError:
-    pass
+
     # print('### please install python module win32')
 import os
-
 
 
 
@@ -40,38 +36,7 @@ class ImportFBXFromClipboardOperator(bpy.types.Operator):
     bl_label = get_translang("Import FBX GLB from Clipboard","クリップボードからFBX GLBインポート")
     
     def execute(self, context):
-        # # クリップボードを開く
-        # win32clipboard.OpenClipboard()
-
-        # # FileName形式のクリップボードデータを取得
-        # filename_format = win32clipboard.RegisterClipboardFormat('FileNameW')
-        # if win32clipboard.IsClipboardFormatAvailable(filename_format):
-        #     input_filenames = win32clipboard.GetClipboardData(filename_format)
-        #     print("###input_filenames",input_filenames)
-
-        #     # バイト列をUTF-16でデコード
-        #     input_filenames = input_filenames.decode('utf-16', errors='ignore')
-
-        #     # ファイル名はNULL文字で区切られているので、それを基に分割
-        #     filenames = input_filenames.split('\x00')
-
-        #     for filename in filenames:
-        #         if filename:  # ファイル名が空でない場合のみ処理
-        #             # ファイル拡張子を正しく表示
-        #             # ファイル名から拡張子を取得
-        #             base_filename, file_extension = os.path.splitext(filename)
-
-        #             # FBXファイルをインポート
-        #             if file_extension.lower() == '.fbx':
-        #                 bpy.ops.import_scene.fbx(filepath=filename)
-
-        #             # GLBファイルをインポート
-        #             elif file_extension.lower() == '.glb':
-        #                 bpy.ops.import_scene.gltf(filepath=filename)
-
-        # # クリップボードを閉じる
-        # win32clipboard.CloseClipboard()
-        
+       
         import ctypes
         import struct
 
