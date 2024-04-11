@@ -11,7 +11,7 @@ class OBJECT_OT_JoinHierarchyObjects(bpy.types.Operator):
         name="Hide Original Objects",
         description="Hide the original objects after joining",
         default=True
-    ) # type: ignore
+    )
     
     @classmethod
     def poll(cls, context):

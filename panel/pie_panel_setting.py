@@ -181,7 +181,7 @@ class SIMPLEOBJECT_PT_PANEL(PIE3D_PT_PIESETTINGARM_main,Panel):
 
         layout.label(text=get_translang('Instans Object','インスタンス化'))
                 # サブメニューの登録
-        # layout.operator("object.objectinstansmirror_operator", text="オブジェクトのミラー化", icon="MOD_MIRROR")
+        layout.operator("object.objectinstansmirror_operator", text="オブジェクトのミラー化", icon="MOD_MIRROR")
         layout.operator("object.objectinstans_operator", text="インスタンス化", icon="OUTLINER_OB_GROUP_INSTANCE")
         layout.separator()
         layout.operator("object.cleanupinstans_operator", text="クリーンアップ", icon="FILE_REFRESH")
