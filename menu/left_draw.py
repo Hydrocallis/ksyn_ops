@@ -139,9 +139,9 @@ def left_draw(self):
         row = box.row(align=True)
             
         if hasattr(bpy.types, "SIMPLEOBJECT_PT_PANEL"):
-            row.label(text="SIMPLE OBJECT")
+            # row.label(text="SIMPLE OBJECT")
             row = box.row(align=True)
-            row.popover("SIMPLEOBJECT_PT_PANEL", text = "SIMPLEOBJECT_PT_PANEL", icon='FILE_3D')
+            # row.popover("SIMPLEOBJECT_PT_PANEL", text = "SIMPLEOBJECT_PT_PANEL", icon='FILE_3D')
         else:
             # print('###OBJECT_PT_piesetting_fbxexport','のクラスが見つかりませんのでパスします。', )
             pass

@@ -9,6 +9,7 @@ def right_draw(self):
     layout = self.layout
     pie = layout.menu_pie()
     box = pie.split().column()
+    row = box.row(align=True)
     
     row.label(text=get_translang("display-related","表示関係"))
     row = box.row(align=True)

@@ -103,7 +103,7 @@ class OBJECT_OT_boolean_targets_enum(bpy.types.Operator):
 
 
 class OBJECT_PT_BooleanObjectsPanel(bpy.types.Panel):
-    bl_label = "Boolean Objects"
+    bl_label = "KSYN Boolean Objects Status"
     bl_idname = "OBJECT_PT_boolean_objects"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
@@ -220,7 +220,7 @@ class SelectObjectBool(Operator):
                                     default=True,
                                     ) # type: ignore
 
-    sline_Intersect_vector: bpy.props.FloatVectorProperty(default =(1,1,1),
+    sline_Intersect_vector: bpy.props.FloatVectorProperty(default =(0.99,0.99,0.99),
                                                           subtype="XYZ"
 
         )# type: ignore
