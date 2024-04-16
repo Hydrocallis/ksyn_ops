@@ -95,9 +95,10 @@ from .registration import register_classes,unregister_classes
 from ksyn_ops.registration import addon_keymapscuspie# type: ignore
 from ksyn_ops.operators.create_autoliner_empy import OUTLINER_MT_objectregister,OUTLINER_MT_objectunregister # type: ignore
 from ksyn_ops.operators.translate_property import translate_property_register,translate_property_unregister# type: ignore
-
 # アドオンの項目の設定項目
 
+from bpy.utils import previews
+ 
 
 
 # 辞書登録関数　開始
@@ -121,8 +122,17 @@ def GetTranslationDict():
 classes = (
             )
 
+ksynops_preview_collections = {}
 
 def register():
+    pcoll = previews.new()
+    addon_dir = os.path.dirname(__file__)
+    pcoll.load("diff", os.path.join(addon_dir, "icons", "diff.png"), 'IMAGE')
+    pcoll.load("join", os.path.join(addon_dir, "icons", "join.png"), 'IMAGE')
+    pcoll.load("int", os.path.join(addon_dir, "icons", "int.png"), 'IMAGE')
+    pcoll.load("slice", os.path.join(addon_dir, "icons", "slice.png"), 'IMAGE')
+    ksynops_preview_collections["main"] = pcoll
+
 
     panel.register()
     menu.register()
@@ -173,6 +183,12 @@ def register():
     except: pass
 
 def unregister():
+    # Remove the preview collection
+    pcoll = ksynops_preview_collections.pop("main")
+    previews.remove(pcoll)
+    ksynops_preview_collections["main"] = pcoll
+
+
 
     panel.unregister()
     menu.unregister()

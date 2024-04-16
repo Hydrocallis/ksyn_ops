@@ -119,6 +119,13 @@ class OBJECT_PT_BooleanObjectsPanel(bpy.types.Panel):
         return target_objects
     
     def draw(self, context):
+        try:
+            from .. import ksynops_preview_collections
+        except:
+            from ksyn_ops import ksynops_preview_collections # type: ignore
+
+        pcoll = ksynops_preview_collections["main"]
+   
         layout = self.layout
         layout.operator("object.selectobjectbool_operator").cmd = "simpleboolean"
         layout.operator("object.selectobjectbool_operator",text=get_translang('Appy Boolean','ブーリアン適応')).cmd = "applyboolean"
@@ -142,9 +149,29 @@ class OBJECT_PT_BooleanObjectsPanel(bpy.types.Panel):
                         else:
                             bool_modifire_viewport_reslut=False
 
-                        grid = layout.grid_flow(row_major=True, columns=4, even_columns=True, even_rows=True, align=True)
+                        grid = layout.grid_flow(row_major=True, columns=5, even_columns=True, even_rows=True, align=True)
                 
                         grid.label(text="- " + boolean_obj.name)
+                        if "ksynbooly_slice_dif" in modifier_name:
+                            operation_name = "SLICE_DIFFERENCE"
+                            ope_icon=pcoll["slice"].icon_id
+                        elif "ksynbooly_slice_int" in modifier_name:
+                            operation_name = "SLICE_INTERSECT"
+                            ope_icon=pcoll["int"].icon_id
+                        elif "ksynbooly_slice_gapint" in modifier_name:
+                            operation_name = "SLICE_GAP_INTERSECT"
+                            ope_icon=pcoll["diff"].icon_id
+                        else:
+                            operation_name = obj.modifiers[modifier_name].operation
+                            if  obj.modifiers[modifier_name].operation=="DIFFERENCE":
+                                ope_icon=pcoll["diff"].icon_id
+                            elif  obj.modifiers[modifier_name].operation=="UNION":
+                                ope_icon=pcoll["jon"].icon_id
+                            elif  obj.modifiers[modifier_name].operation=="INTERSECT":
+                                ope_icon=pcoll["int"].icon_id
+
+
+                        grid.label(text=operation_name, icon_value=ope_icon)
                         grid.operator("object.boolean_targets_enum",depress = obj_hide_reslut, icon=f"HIDE_OFF" if obj_hide_reslut else f"HIDE_ON",text="").cmd =str((boolean_obj.name, obj_hide_reslut))
                         # grid.operator("object.boolean_targets_enum",depress =reslut,text=f"Show" if reslut else f"Hide").cmd =str(("bool_viewport", modifier_name))
                         grid.operator("object.boolean_targets_enum",text="", icon="RESTRICT_VIEW_OFF" ,depress =bool_modifire_viewport_reslut ).cmd =str(("bool_viewport", modifier_name))
@@ -260,7 +287,6 @@ class SelectObjectBool(Operator):
 
         return message_poplist,prev_name
 
-
     def applyboolean(self,obj,message_poplist):
         togle = None
 
@@ -275,7 +301,6 @@ class SelectObjectBool(Operator):
         if togle == 'EDIT_MESH':
             bpy.ops.object.editmode_toggle()
         return message_poplist
-
 
     def wireon(self,sel_obj):
         sel_obj.display_type = 'WIRE'
@@ -370,8 +395,6 @@ class SelectObjectBool(Operator):
             pass
 
 
-
-
     def selected_single_bool_first(self,obs,activeob,operation_enum,add_tryi,slice_op=False):
         for sel_obj in obs:
                     # アクティブなオブジェクトにブールモディファイアを適応
@@ -381,12 +404,14 @@ class SelectObjectBool(Operator):
             bool.object = activeob
             if operation_enum=="SLICE":
                 bool.operation = "DIFFERENCE"
+                bool.name = "ksynbooly_slice_dif"
  
             else:
                 bool.operation = operation_enum
 
             if slice_op==True:
                 bool.operation = "INTERSECT"
+                bool.name = "ksynbooly_slice_gapint"
 
             bool.solver = 'FAST'
             self.add_triangul(add_tryi, sel_obj)
@@ -426,6 +451,8 @@ class SelectObjectBool(Operator):
                     bool = sel_obj.modifiers[-1]
 
                 bool.operation = "INTERSECT"
+                bool.name = "ksynbooly_slice_int"
+
 
 
             if self.sline_Intersect_bool:
@@ -500,6 +527,7 @@ class SelectObjectBool(Operator):
 
     def execute(self, context):
         save_act_obj = bpy.context.view_layer.objects.active 
+        seleobj=bpy.context.selected_objects
 
         if self.cmd =="applyboolean":
             message_poplist=[]
@@ -514,6 +542,10 @@ class SelectObjectBool(Operator):
         else:
             self.main(self.selected_mulch_bool, self.parent_bool,self.operation_enum,self.add_tryi_bool)
         save_act_obj.select_set(True)
+
+        for obj in seleobj:
+            if not obj.select_get():
+                obj.select_set(True)
         return {'FINISHED'}
     def draw(self, context):
         
