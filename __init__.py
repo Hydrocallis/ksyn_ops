@@ -124,15 +124,19 @@ classes = (
 
 ksynops_preview_collections = {}
 
-def register():
+def register_icons():
     pcoll = previews.new()
     addon_dir = os.path.dirname(__file__)
     pcoll.load("diff", os.path.join(addon_dir, "icons", "diff.png"), 'IMAGE')
     pcoll.load("join", os.path.join(addon_dir, "icons", "join.png"), 'IMAGE')
     pcoll.load("int", os.path.join(addon_dir, "icons", "int.png"), 'IMAGE')
     pcoll.load("slice", os.path.join(addon_dir, "icons", "slice.png"), 'IMAGE')
+    pcoll.load("slice_int", os.path.join(addon_dir, "icons", "slice-int.png"), 'IMAGE')
+    pcoll.load("slice_gap", os.path.join(addon_dir, "icons", "slice-gap.png"), 'IMAGE')
     ksynops_preview_collections["main"] = pcoll
 
+def register():
+    register_icons()
 
     panel.register()
     menu.register()
@@ -155,15 +159,6 @@ def register():
 
     wm = bpy.context.window_manager
     
-    # # メッシュモードでのキーマップ登録
-    # if wm.keyconfigs.addon:
-    #     # Views numpad
-    #     km = wm.keyconfigs.addon.keymaps.new(name='Mesh', space_type='EMPTY')
-    #     kmi = km.keymap_items.new('wm.call_menu_pie', 'Q', 'PRESS', shift=True, ctrl=True)
-    #     kmi.properties.name = "KSYN_MT_viewnumpad_panel"# これが被ってるとバグる
-    #     addon_keymapscuspie.append((km, kmi))
-
-    # wm = bpy.context.window_manager
  
     # メッシュモードでのキーマップ登録
     if wm.keyconfigs.addon:
@@ -182,13 +177,14 @@ def register():
         bpy.app.translations.register(__name__, translation_dict)
     except: pass
 
-def unregister():
+def unregister_icons():
     # Remove the preview collection
     pcoll = ksynops_preview_collections.pop("main")
     previews.remove(pcoll)
     ksynops_preview_collections["main"] = pcoll
 
-
+def unregister():
+    unregister_icons()
 
     panel.unregister()
     menu.unregister()

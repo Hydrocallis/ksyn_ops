@@ -81,10 +81,10 @@ class OBJECT_OT_boolean_targets_enum(bpy.types.Operator):
 
 
         elif tuple_from_str[0] =="bool_viewport":
-            if bpy.context.object.modifiers[tuple_from_str[1]].show_viewport:
-                bpy.context.object.modifiers[tuple_from_str[1]].show_viewport = False
+            if bpy.data.objects[tuple_from_str[2]].modifiers[tuple_from_str[1]].show_viewport:
+                bpy.data.objects[tuple_from_str[2]].modifiers[tuple_from_str[1]].show_viewport = False
             else:
-                bpy.context.object.modifiers[tuple_from_str[1]].show_viewport = True
+                bpy.data.objects[tuple_from_str[2]].modifiers[tuple_from_str[1]].show_viewport = True
 
         else:
             
@@ -118,66 +118,74 @@ class OBJECT_PT_BooleanObjectsPanel(bpy.types.Panel):
 
         return target_objects
     
-    def draw(self, context):
+    def load_panle_boolean_object(self,layout,obj):
         try:
             from .. import ksynops_preview_collections
         except:
             from ksyn_ops import ksynops_preview_collections # type: ignore
 
         pcoll = ksynops_preview_collections["main"]
+        layout.label(text="Boolean Objects for " + obj.name)
+        target_objects = self.get_boolean_modifier_targets(obj)
+        for boolean_obj,modifier_name in target_objects:
+            if  boolean_obj:
+                if boolean_obj.hide_get():
+                    obj_hide_reslut = False
+                else:
+                    obj_hide_reslut = True
+                # print("###b",bpy.context.object)
+            
+                if obj.modifiers[modifier_name].show_viewport:
+                    bool_modifire_viewport_reslut=True
+                else:
+                    bool_modifire_viewport_reslut=False
+
+                grid = layout.grid_flow(row_major=True, columns=5, even_columns=True, even_rows=True, align=True)
+        
+                grid.label(text="- " + boolean_obj.name)
+
+                if "ksynbooly_slice_dif" in modifier_name:
+                    operation_name = "SLICE_DIFFERENCE"
+                    ope_icon=pcoll["slice"].icon_id
+                elif "ksynbooly_slice_int" in modifier_name:
+                    operation_name = "SLICE_INTERSECT"
+                    ope_icon=pcoll["slice_int"].icon_id
+                elif "ksynbooly_slice_gapint" in modifier_name:
+                    operation_name = "SLICE_GAP_INTERSECT"
+                    ope_icon=pcoll["slice_gap"].icon_id
+                else:
+                    operation_name = obj.modifiers[modifier_name].operation
+                    if  obj.modifiers[modifier_name].operation=="DIFFERENCE":
+                        ope_icon=pcoll["diff"].icon_id
+                    elif  obj.modifiers[modifier_name].operation=="UNION":
+                        ope_icon=pcoll["join"].icon_id
+                    elif  obj.modifiers[modifier_name].operation=="INTERSECT":
+                        ope_icon=pcoll["int"].icon_id
+                    else:
+                        ope_icon=pcoll["diff"].icon_id
+
+
+
+
+                grid.label(text=operation_name, icon_value=ope_icon)
+                grid.operator("object.boolean_targets_enum",depress = obj_hide_reslut, icon=f"HIDE_OFF" if obj_hide_reslut else f"HIDE_ON",text="").cmd =str((boolean_obj.name, obj_hide_reslut))
+                # grid.operator("object.boolean_targets_enum",depress =reslut,text=f"Show" if reslut else f"Hide").cmd =str(("bool_viewport", modifier_name))
+                grid.operator("object.boolean_targets_enum",text="", icon="RESTRICT_VIEW_OFF" ,depress =bool_modifire_viewport_reslut ).cmd =str(("bool_viewport", modifier_name,obj.name))
+                grid.operator("object.boolean_targets_enum",text="",icon="CHECKMARK").cmd =str(("apply", modifier_name,obj.name))
+
+
+
+    def draw(self, context):
+
    
         layout = self.layout
         layout.operator("object.selectobjectbool_operator").cmd = "simpleboolean"
         layout.operator("object.selectobjectbool_operator",text=get_translang('Appy Boolean','ブーリアン適応')).cmd = "applyboolean"
         layout.operator("object.boolonoff_operator")
         selected_objects = bpy.context.selected_objects
-
         for obj in selected_objects:
-            layout.label(text="Boolean Objects for " + obj.name)
-            target_objects = self.get_boolean_modifier_targets(obj)
-            for boolean_obj,modifier_name in target_objects:
-                if  boolean_obj:
-#                    print(modifier_name)
-                    if boolean_obj.hide_get():
-                        obj_hide_reslut = False
-                    else:
-                        obj_hide_reslut = True
-                    # print("###b",bpy.context.object)
-                    try:
-                        if bpy.context.object.modifiers[modifier_name].show_viewport:
-                            bool_modifire_viewport_reslut=True
-                        else:
-                            bool_modifire_viewport_reslut=False
-
-                        grid = layout.grid_flow(row_major=True, columns=5, even_columns=True, even_rows=True, align=True)
-                
-                        grid.label(text="- " + boolean_obj.name)
-                        if "ksynbooly_slice_dif" in modifier_name:
-                            operation_name = "SLICE_DIFFERENCE"
-                            ope_icon=pcoll["slice"].icon_id
-                        elif "ksynbooly_slice_int" in modifier_name:
-                            operation_name = "SLICE_INTERSECT"
-                            ope_icon=pcoll["int"].icon_id
-                        elif "ksynbooly_slice_gapint" in modifier_name:
-                            operation_name = "SLICE_GAP_INTERSECT"
-                            ope_icon=pcoll["diff"].icon_id
-                        else:
-                            operation_name = obj.modifiers[modifier_name].operation
-                            if  obj.modifiers[modifier_name].operation=="DIFFERENCE":
-                                ope_icon=pcoll["diff"].icon_id
-                            elif  obj.modifiers[modifier_name].operation=="UNION":
-                                ope_icon=pcoll["jon"].icon_id
-                            elif  obj.modifiers[modifier_name].operation=="INTERSECT":
-                                ope_icon=pcoll["int"].icon_id
-
-
-                        grid.label(text=operation_name, icon_value=ope_icon)
-                        grid.operator("object.boolean_targets_enum",depress = obj_hide_reslut, icon=f"HIDE_OFF" if obj_hide_reslut else f"HIDE_ON",text="").cmd =str((boolean_obj.name, obj_hide_reslut))
-                        # grid.operator("object.boolean_targets_enum",depress =reslut,text=f"Show" if reslut else f"Hide").cmd =str(("bool_viewport", modifier_name))
-                        grid.operator("object.boolean_targets_enum",text="", icon="RESTRICT_VIEW_OFF" ,depress =bool_modifire_viewport_reslut ).cmd =str(("bool_viewport", modifier_name))
-                        grid.operator("object.boolean_targets_enum",text="",icon="CHECKMARK").cmd =str(("apply", modifier_name,obj.name))
-                    except KeyError:
-                        pass
+            self.load_panle_boolean_object(layout,obj)
+          
 
 class BoolOnOff(Operator):
     bl_idname = "object.boolonoff_operator"
@@ -467,6 +475,10 @@ class SelectObjectBool(Operator):
 
                 self.selected_single_bool_first(selfobj,bpy.context.object,operation_enum,add_tryi,slice_op=slice_op)
                 self.slice_object_transform()
+
+                # ギャップをつけた際に非選択になったスライスしたオブジェクトを選択状態にする
+                for obj in selfobj:
+                    obj.select_set(True)
                 
                 slice_op=False
                 
