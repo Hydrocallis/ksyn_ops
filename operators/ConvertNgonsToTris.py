@@ -1,7 +1,11 @@
 
 import bpy
 import bmesh
-from ksyn_bpy_chat_gpt.utils.get_translang import get_translang
+try:
+    from ..utils.get_translang import get_translang
+
+except:
+    from ksyn_ops.utils.get_translang import get_translang # type: ignore
 
 def ShowMessageBox(message=[""], title="Message Box", icon='INFO'):
     def draw(self, context):
@@ -27,7 +31,7 @@ class ConvertNgonsToTrisOperator(bpy.types.Operator):
     bl_description = "Converts ngons to tris for all selected objects"
     bl_options = {'REGISTER', 'UNDO'}
 
-    convert_tris : bpy.props.BoolProperty(name="Convert",default=True)
+    convert_tris : bpy.props.BoolProperty(name="Convert",default=True) # type: ignore
 
     @classmethod
     def poll(cls, context):
