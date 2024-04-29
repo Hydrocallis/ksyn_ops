@@ -15,8 +15,7 @@ from bpy.props import (
                         BoolProperty,
                         PointerProperty,
                         FloatVectorProperty,
-                        StringProperty
-                        )
+                        StringProperty)
 
 def get_translang(eng,trans):
     prev = bpy.context.preferences.view
@@ -179,6 +178,12 @@ class OBJECT_PT_BooleanObjectsPanel(bpy.types.Panel):
                 grid.label(text=f"")    
                 grid.label(text=f"",icon="MOD_TRIANGULATE")
 
+    def load_panle_mirror_object(self,layout,obj):
+        grid = layout.grid_flow(row_major=True, columns=5, even_columns=True, even_rows=True, align=True)
+        for mod in obj.modifiers:
+            if mod.type == 'MIRROR':
+                grid.label(text=f"")    
+                grid.label(text=f"",icon="MOD_MIRROR")
 
     def draw(self, context):
         layout = self.layout
@@ -191,7 +196,8 @@ class OBJECT_PT_BooleanObjectsPanel(bpy.types.Panel):
         
         for obj in selected_objects:
             self.load_panle_boolean_object(layout,obj)
-            self.load_panle_trimod_object(layout,obj)
+            self.load_panle_trimod_object(layout, obj)
+            self.load_panle_mirror_object(layout, obj)
     
 class BoolOnOff(Operator):
     bl_idname = "object.boolonoff_operator"
