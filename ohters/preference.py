@@ -1,4 +1,5 @@
 
+import bpy
 from bpy.types import Operator, AddonPreferences
 from bpy.props import StringProperty, IntProperty, BoolProperty
 
@@ -6,13 +7,53 @@ from bpy.props import StringProperty, IntProperty, BoolProperty
 try:
     from ..registration import addon_keymapscuspie
     from set_module import install
+    from .. import addon_updater_ops
+
+
 
 except ImportError:
 
     from ksyn_ops.registration import addon_keymapscuspie # type: ignore
     from ksyn_ops.ohters.set_module import install # type: ignore
+    from ksyn_ops import addon_updater_ops # type: ignore
 
-class ExampleAddonPreferences(AddonPreferences):
+
+class UpdaterProps:
+    
+    auto_check_update : bpy.props.BoolProperty(
+		name="Auto-check for Update",
+		description="If enabled, auto-check for updates using an interval",
+		default=False) # type: ignore
+
+    updater_interval_months : bpy.props.IntProperty(
+		name='Months',
+		description="Number of months between checking for updates",
+		default=0,
+		min=0)# type: ignore
+
+    updater_interval_days : bpy.props.IntProperty(
+		name='Days',
+		description="Number of days between checking for updates",
+		default=7,
+		min=0,
+		max=31)# type: ignore
+
+    updater_interval_hours : bpy.props.IntProperty(
+		name='Hours',
+		description="Number of hours between checking for updates",
+		default=0,
+		min=0,
+		max=23)# type: ignore
+
+    updater_interval_minutes : bpy.props.IntProperty(
+		name='Minutes',
+		description="Number of minutes between checking for updates",
+		default=0,
+		min=0,
+		max=59)# type: ignore
+
+
+class ExampleAddonPreferences(AddonPreferences,UpdaterProps):
     # this must match the add-on name, use '__package__'
     # when defining this in a submodule of a python package.
     bl_idname = "ksyn_ops"
@@ -43,6 +84,9 @@ class ExampleAddonPreferences(AddonPreferences):
         layout.prop(self, "adminmode")
         layout.prop(self, "api_key")
         install(self)
+
+        addon_updater_ops.update_settings_ui(self, context)
+
 
         import rna_keymap_ui 
         layout = self.layout

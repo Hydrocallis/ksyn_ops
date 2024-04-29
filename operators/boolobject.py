@@ -101,7 +101,6 @@ class OBJECT_OT_boolean_targets_enum(bpy.types.Operator):
 
         return {'FINISHED'}
 
-
 class OBJECT_PT_BooleanObjectsPanel(bpy.types.Panel):
     bl_label = "KSYN Boolean Objects Status"
     bl_idname = "OBJECT_PT_boolean_objects"
@@ -109,8 +108,6 @@ class OBJECT_PT_BooleanObjectsPanel(bpy.types.Panel):
     bl_region_type = 'UI'
     bl_category = "KSYN"
     bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
-
-
 
     def get_boolean_modifier_targets(self,obj):
         boolean_modifiers = [modifier for modifier in obj.modifiers if modifier.type == 'BOOLEAN']
@@ -127,6 +124,7 @@ class OBJECT_PT_BooleanObjectsPanel(bpy.types.Panel):
         pcoll = ksynops_preview_collections["main"]
         layout.label(text="Boolean Objects for " + obj.name)
         target_objects = self.get_boolean_modifier_targets(obj)
+
         for boolean_obj,modifier_name in target_objects:
             if  boolean_obj:
                 if boolean_obj.hide_get():
@@ -172,21 +170,29 @@ class OBJECT_PT_BooleanObjectsPanel(bpy.types.Panel):
                 # grid.operator("object.boolean_targets_enum",depress =reslut,text=f"Show" if reslut else f"Hide").cmd =str(("bool_viewport", modifier_name))
                 grid.operator("object.boolean_targets_enum",text="", icon="RESTRICT_VIEW_OFF" ,depress =bool_modifire_viewport_reslut ).cmd =str(("bool_viewport", modifier_name,obj.name))
                 grid.operator("object.boolean_targets_enum",text="",icon="CHECKMARK").cmd =str(("apply", modifier_name,obj.name))
-
+        
+    def load_panle_trimod_object(self,layout,obj):
+    
+        grid = layout.grid_flow(row_major=True, columns=5, even_columns=True, even_rows=True, align=True)
+        for mod in obj.modifiers:
+            if mod.type == 'TRIANGULATE':
+                grid.label(text=f"")    
+                grid.label(text=f"",icon="MOD_TRIANGULATE")
 
 
     def draw(self, context):
-
-   
         layout = self.layout
         layout.operator("object.selectobjectbool_operator").cmd = "simpleboolean"
         layout.operator("object.selectobjectbool_operator",text=get_translang('Appy Boolean','ブーリアン適応')).cmd = "applyboolean"
         layout.operator("object.boolonoff_operator")
+        layout.operator("object.selectobjectbool_operator",text=get_translang('Triangle modifier remove','三角モディファイアを削除')).cmd = "remove_Triangle"
+        layout.operator("object.selectobjectbool_operator",text=get_translang('Triangle modifier add','三角モディファイアを追加')).cmd = "add_Triangle"
         selected_objects = bpy.context.selected_objects
+        
         for obj in selected_objects:
             self.load_panle_boolean_object(layout,obj)
-          
-
+            self.load_panle_trimod_object(layout,obj)
+    
 class BoolOnOff(Operator):
     bl_idname = "object.boolonoff_operator"
     bl_label = get_translang("Wire for boule ON/OFF","ブール用ワイヤーON/OFF")
@@ -210,11 +216,7 @@ class BoolOnOff(Operator):
 
         return {'FINISHED'}
 
-class SelectObjectBool(Operator):
-    bl_idname = "object.selectobjectbool_operator"
-    bl_label = "Simple Boolean"
-    bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
-    bl_options = {'REGISTER', 'UNDO', 'PRESET'}
+class SelectObjectBool_props():
 
     options = [
         ('DIFFERENCE', 'Difference', 'Difference'),
@@ -267,7 +269,11 @@ class SelectObjectBool(Operator):
 
     booleanname='ksynbooly'
 
-
+class SelectObjectBool(Operator,SelectObjectBool_props):
+    bl_idname = "object.selectobjectbool_operator"
+    bl_label = "Simple Boolean"
+    bl_description = f" CLASS_NAME_IS={sys._getframe().f_code.co_name}\n ID_NAME_IS={bl_idname}\n FILENAME_IS={__file__}\n "
+    bl_options = {'REGISTER', 'UNDO', 'PRESET'}
 
     def get_and_apply_mod(self,mod,obj,message_poplist,prev_name):
         if mod.type == 'BOOLEAN':
@@ -353,19 +359,54 @@ class SelectObjectBool(Operator):
             self.linkcolobject(activeob)
             self.checkunlinkcol(activeob, "BOOL")
 
-    def add_triangul(self,add_tryi, obj):
+    def add_triangul(self, add_tryi, obj, add_triy_dics={"move_trymod": [], "new_trymod": []}):
+
         if add_tryi:
             if obj.modifiers.get("Bool Triangulate"):
-                act_obj=bpy.context.view_layer.objects.active 
+                act_obj = bpy.context.view_layer.objects.active 
                 bpy.context.view_layer.objects.active = obj
-                obj_mod_count=len(obj.modifiers)-1
+                obj_mod_count = len(obj.modifiers) - 1
                 # トライアングルモディファイをもとに戻す
                 bpy.ops.object.modifier_move_to_index(modifier="Bool Triangulate", index=obj_mod_count)
-                #　return to the point (of a discussion)
+                # return to the point (of a discussion)
                 bpy.context.view_layer.objects.active = act_obj
-
+                # Add the object to the move_trymod list in the dictionary
+                add_triy_dics["move_trymod"].append(obj.name+" Move try mod")
             else:
-                tri_modi = obj.modifiers.new(name='Bool Triangulate', type='TRIANGULATE')
+                obj.modifiers.new(name='Bool Triangulate', type='TRIANGULATE')
+                # Add the object to the new_trymod list in the dictionary
+                add_triy_dics["new_trymod"].append(obj.name + " New Add try mod")
+
+        return add_triy_dics
+
+    def dict_to_list(self, dict_obj):
+        result_list = []
+        for key, value_list in dict_obj.items():
+            for value in value_list:
+                result_list.append(value)
+        return result_list
+    
+    def remove_triangulate_modifier(self,obj_name,removelist):
+        obj = bpy.data.objects[obj_name]
+        for mod in obj.modifiers:
+            if mod.type == 'TRIANGULATE':
+                obj.modifiers.remove(mod)
+                removelist.append(obj.name+" remove try mod")
+        return removelist
+
+    def select_triangul(self, cmd):
+        add_triy_dics = {"move_trymod": [], "new_trymod": []}
+        removelist=[]
+
+        for obj in bpy.context.selected_objects:
+            if cmd=="remove_Triangle":
+                removelist=self.remove_triangulate_modifier(obj.name,removelist)
+                result=removelist
+            elif cmd=="add_Triangle":
+                add_triy_dics=self.add_triangul(add_tryi=True,obj=obj,add_triy_dics=add_triy_dics)
+                result=self.dict_to_list(add_triy_dics)
+
+        ShowMessageBox(message = result , title = "Message Box", icon = 'INFO')
 
     # アクティブなオブジェクトにブールをかける
     def selected_mulch(self, obs,activeob,parent_bool,operation_enum,add_tryi):
@@ -401,7 +442,6 @@ class SelectObjectBool(Operator):
             
         else:
             pass
-
 
     def selected_single_bool_first(self,obs,activeob,operation_enum,add_tryi,slice_op=False):
         for sel_obj in obs:
@@ -442,7 +482,6 @@ class SelectObjectBool(Operator):
             bpy.context.object.location[2]+self.sline_Intersect_location_vector[2],
             )
  
-
     def slile_obj(self,operation_enum,activeob,obs,add_tryi):
         if operation_enum=="SLICE":
             activeob.select_set(False)
@@ -481,16 +520,12 @@ class SelectObjectBool(Operator):
                     obj.select_set(True)
                 
                 slice_op=False
-                
-
-    # slice機能の時はこの関数を使用
-    # 選択したオブジェクトにアクティブなオブジェクトのブールをかける
+    # 選択したオブジェクトにアクティブなオブジェクトのブールをかける# slice機能の時はこの関数を使用
     def selected_single_bool(self, obs,activeob,operation_enum,add_tryi):
 
         self.selected_single_bool_first(obs,activeob,operation_enum,add_tryi)
         self.slile_obj(operation_enum,activeob,obs,add_tryi)
        
-
     def main(self, selected_mulch_bool, parent_bool,operation_enum,add_tryi):
 
         # 削りたい対象のオブジェクト（アクティブ）を定義
@@ -537,6 +572,9 @@ class SelectObjectBool(Operator):
                         self.layout.prop(self,"sline_Intersect_location_vector")
             self.layout.prop(self,"add_tryi_bool")
 
+        elif self.cmd =="remove_Triangle" or self.cmd == "add_Triangle":
+            pass
+
     def execute(self, context):
         save_act_obj = bpy.context.view_layer.objects.active 
         seleobj=bpy.context.selected_objects
@@ -550,6 +588,9 @@ class SelectObjectBool(Operator):
                 message_poplist=["none object"]
             ShowMessageBox(message= message_poplist)
             bpy.context.scene["boolean_applay_list"]=message_poplist
+
+        elif self.cmd =="remove_Triangle" or self.cmd == "add_Triangle":
+            self.select_triangul(self.cmd)    
             
         else:
             self.main(self.selected_mulch_bool, self.parent_bool,self.operation_enum,self.add_tryi_bool)
@@ -558,7 +599,9 @@ class SelectObjectBool(Operator):
         for obj in seleobj:
             if not obj.select_get():
                 obj.select_set(True)
+
         return {'FINISHED'}
+    
     def draw(self, context):
         
         self.draw_main()

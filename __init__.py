@@ -98,6 +98,7 @@ from ksyn_ops.operators.translate_property import translate_property_register,tr
 # アドオンの項目の設定項目
 
 from bpy.utils import previews
+from . import addon_updater_ops
  
 
 
@@ -136,6 +137,8 @@ def register_icons():
     ksynops_preview_collections["main"] = pcoll
 
 def register():
+    addon_updater_ops.register(bl_info)
+
     register_icons()
 
     panel.register()
@@ -184,6 +187,8 @@ def unregister_icons():
     ksynops_preview_collections["main"] = pcoll
 
 def unregister():
+    addon_updater_ops.unregister()
+
     unregister_icons()
 
     panel.unregister()
