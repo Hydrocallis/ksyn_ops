@@ -6,6 +6,8 @@ __pycache__/
 # C extensions
 *.so
 
+# ksyn_ops_updater/
+ksyn_ops_updater/
 # Distribution / packaging
 .Python
 build/
