@@ -1,11 +1,22 @@
 import bpy
 
+mirmodname="ksyn_mirror"
+
 def get_translang(eng,trans):
     prev=bpy.context.preferences.view
     if prev.language =='ja_JP' and prev.use_translate_interface == True:
          return trans
     else:
          return eng
+
+def move_mirror_index():
+    save_actobj = bpy.context.view_layer.objects.active
+          
+    for obj in bpy.context.selected_objects:
+        bpy.context.view_layer.objects.active = obj
+        bpy.ops.object.modifier_move_to_index(modifier=mirmodname, index=0)
+    
+    bpy.context.view_layer.objects.active = save_actobj
 
 def bicect(location,plane_no):
     bpy.ops.mesh.select_all(action='SELECT')
@@ -20,7 +31,7 @@ def add_mirror_mod(self,obj,active_object,mirmodname):
     mirror_mod = None
     
     for mod in obj.modifiers:
-        if mod.name == "ksyn_mirror":
+        if mod.name == mirmodname:
             mirror_mod = mod
 
     if mirror_mod ==None:
@@ -42,9 +53,7 @@ def add_mirror_mod(self,obj,active_object,mirmodname):
     if "Z" in self.axis_mirror:
         mirror_mod.use_axis[2] = True
     return mirror_mod
-
   
-
 def add_mod(self,obj,active_object,mirmodname):
     
     mirror_mod = add_mirror_mod(self,obj,active_object,mirmodname)
@@ -64,7 +73,6 @@ def apply_modifire_mirror(self,obj,active_object,mirmodname):
         bpy.ops.object.modifier_apply(modifier=mirmodname)
     bpy.context.view_layer.objects.active = active_object
     
-
 def drawmain(self):
     row= self.layout.row(align=True)
     gridbox = row.box() 
@@ -88,6 +96,8 @@ def drawmain(self):
     row.prop(self,"look_editmode")
     row= self.layout.row(align=True)
     row.prop(self,"applymod")
+    row= self.layout.row(align=True)
+    row.prop(self,"move_mirror_index_prop")
     
 def bicect_adder(self,location):
     if bpy.context.mode!= "EDIT_MESH":
@@ -125,63 +135,10 @@ def bicect_adder(self,location):
         plane_no =(0,0,z)
         bicect(location,plane_no)
 
-
-def main(self):
-    mirmodname="ksyn_mirror"
-
-    editmode = str(bpy.context.mode)
-    # アクティブオブジェクトを取得
-
-    active_object = bpy.context.active_object
-    location=bpy.context.object.location.xyz
-    
-    # 選択されたオブジェクトのリストを取得
-    selected_objects = bpy.context.selected_objects
-    # アクティブオブジェクトを除外したリストを作成
-    filtered_objects = [obj for obj in selected_objects if obj != active_object]
-    # print("###filtered_objects",filtered_objects)
-    if filtered_objects==[]:
-        add_mod(self,bpy.context.object,bpy.context.object,mirmodname)
-
-    else:
-        for obj in filtered_objects:
-            add_mod(self,obj,active_object,mirmodname)
-            #　オブジェクトが複数ある場合は対象から除外し、一時的にアクティブオブジェクトをずらす
-            if obj ==filtered_objects[-1]:
-                bpy.context.object.select_set(False)
-                bpy.context.view_layer.objects.active = obj
-    
-    bicect_adder(self,location)
-
-    if len(bpy.context.selected_objects)==1:
-        apply_modifire_mirror(self,active_object,active_object,mirmodname)
-
-
-
-
-    if self.look_editmode != True:
-        if editmode =='EDIT_MESH':
-            editmode = "EDIT"
-        bpy.ops.object.mode_set(mode=editmode)
-    else:
-        bpy.ops.object.mode_set(mode="EDIT")
-
-    #　アクティブオブジェクトをもとに戻す
-    bpy.context.view_layer.objects.active = active_object
-    active_object.select_set(True)
-
-
-
-
-
-
-
 class Meshmirror_operator(bpy.types.Operator):
     bl_idname = "object.meshmirror_operator"
     bl_label = "Mesh Mirror"
-
-    bl_options = {'REGISTER', 'UNDO'}
-
+    bl_options = {'REGISTER', 'UNDO', 'PRESET'}
 
     axis_bicect: bpy.props.EnumProperty(
         options={"ENUM_FLAG"}, 
@@ -200,21 +157,61 @@ class Meshmirror_operator(bpy.types.Operator):
         ) # type: ignore
     
     look_editmode : bpy.props.BoolProperty(name="Edit Mode") # type: ignore
-    
-    
+        
     applymod : bpy.props.BoolProperty(name=get_translang("Apply","適応")) # type: ignore
-    
-    
 
+    move_mirror_index_prop : bpy.props.BoolProperty(
+        name=get_translang("Modifier order to the top level","モディファイアの順序を最上位にする"),
+        default=True
+        ) # type: ignore
+        
     def execute(self, context):
-
-    
-        main(self)
-
+        self.main()
         return {'FINISHED'}
     
     def draw(self,context):
         drawmain(self)
+            
+    def main(self):
+        editmode = str(bpy.context.mode)
+        # アクティブオブジェクトを取得
+        active_object = bpy.context.active_object
+        location=bpy.context.object.location.xyz
+         # 選択されたオブジェクトのリストを取得
+        selected_objects = bpy.context.selected_objects
+        # アクティブオブジェクトを除外したリストを作成
+        filtered_objects = [obj for obj in selected_objects if obj != active_object]
+        # print("###filtered_objects",filtered_objects)
+        if filtered_objects==[]:
+            add_mod(self,bpy.context.object,bpy.context.object,mirmodname)
+        else:
+            for obj in filtered_objects:
+                add_mod(self,obj,active_object,mirmodname)
+                #　オブジェクトが複数ある場合は対象から除外し、一時的にアクティブオブジェクトをずらす
+                if obj ==filtered_objects[-1]:
+                    bpy.context.object.select_set(False)
+                    bpy.context.view_layer.objects.active = obj
+        
+        bicect_adder(self,location)
+
+        if len(bpy.context.selected_objects)==1:
+            apply_modifire_mirror(self,active_object,active_object,mirmodname)
+
+        if self.look_editmode != True:
+            if editmode =='EDIT_MESH':
+                editmode = "EDIT"
+            bpy.ops.object.mode_set(mode=editmode)
+        else:
+            bpy.ops.object.mode_set(mode="EDIT")
+
+        #　アクティブオブジェクトをもとに戻す
+        bpy.context.view_layer.objects.active = active_object
+        active_object.select_set(True)
+
+        if self.move_mirror_index_prop:
+            move_mirror_index()
+
+
 
 
 

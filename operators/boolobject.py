@@ -170,20 +170,41 @@ class OBJECT_PT_BooleanObjectsPanel(bpy.types.Panel):
                 grid.operator("object.boolean_targets_enum",text="", icon="RESTRICT_VIEW_OFF" ,depress =bool_modifire_viewport_reslut ).cmd =str(("bool_viewport", modifier_name,obj.name))
                 grid.operator("object.boolean_targets_enum",text="",icon="CHECKMARK").cmd =str(("apply", modifier_name,obj.name))
         
-    def load_panle_trimod_object(self,layout,obj):
-    
-        grid = layout.grid_flow(row_major=True, columns=5, even_columns=True, even_rows=True, align=True)
+    def load_panle_mod_object(self,layout,obj):
+        grid = layout.grid_flow(row_major=True, columns=1, even_columns=True, even_rows=True, align=True)
+        mod_icon=""
+        modmaxcount = (len(obj.modifiers))
         for mod in obj.modifiers:
+            # grid.label(text=f"")
+            modifier_index = self.find_modifier_index(obj, mod.name) + 1
             if mod.type == 'TRIANGULATE':
-                grid.label(text=f"")    
-                grid.label(text=f"",icon="MOD_TRIANGULATE")
+                mod_icon="MOD_TRIANGULATE"
+                grid.label(text=f"index:{modifier_index}/{modmaxcount}",icon=mod_icon)
+            elif mod.type == 'MIRROR':
+                mod_icon="MOD_MIRROR"
+                grid.label(text=f"index:{modifier_index}/{modmaxcount}",icon=mod_icon)
+            else:
+                pass
 
-    def load_panle_mirror_object(self,layout,obj):
-        grid = layout.grid_flow(row_major=True, columns=5, even_columns=True, even_rows=True, align=True)
-        for mod in obj.modifiers:
-            if mod.type == 'MIRROR':
-                grid.label(text=f"")    
-                grid.label(text=f"",icon="MOD_MIRROR")
+    def find_modifier_index(self,object, modifier_name):
+        # モディファイアのリストを取得します
+        modifiers = object.modifiers
+        # 指定した名前のモディファイアを探します
+        modifier_index = None
+        for index, modifier in enumerate(modifiers):
+            if modifier.name == modifier_name:
+                modifier_index = index
+                break
+
+        # モディファイアのインデックス番号を返します
+        return modifier_index
+    # def load_panle_mirror_object(self,layout,obj):
+    #     grid = layout.grid_flow(row_major=True, columns=5, even_columns=True, even_rows=True, align=True)
+    #     for mod in obj.modifiers:
+    #         if mod.type == 'MIRROR':
+    #             grid.label(text=f"")    
+    #             self.find_modifier_index(self,obj, mod.name)    
+    #             grid.label(text=f"",icon="MOD_MIRROR")
 
     def draw(self, context):
         layout = self.layout
@@ -196,8 +217,7 @@ class OBJECT_PT_BooleanObjectsPanel(bpy.types.Panel):
         
         for obj in selected_objects:
             self.load_panle_boolean_object(layout,obj)
-            self.load_panle_trimod_object(layout, obj)
-            self.load_panle_mirror_object(layout, obj)
+            self.load_panle_mod_object(layout, obj)
     
 class BoolOnOff(Operator):
     bl_idname = "object.boolonoff_operator"
