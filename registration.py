@@ -10,6 +10,8 @@ addon_path = os.path.dirname(os.path.realpath(__file__))
 addon_keymapscuspie = []
 
 class_paths = [
+    ("operators", "mod_status", "BevelSettingsPanel"),
+    ("operators", "mod_status", "Bevel"),
     ("operators", "pie_op", "GetFacebySide"),
     ("operators", "pie_op", "ImportFBXFromClipboardOperator"),
     ("operators", "pie_op", "RenameActiveNodeOperator"),

@@ -198,13 +198,6 @@ class OBJECT_PT_BooleanObjectsPanel(bpy.types.Panel):
 
         # モディファイアのインデックス番号を返します
         return modifier_index
-    # def load_panle_mirror_object(self,layout,obj):
-    #     grid = layout.grid_flow(row_major=True, columns=5, even_columns=True, even_rows=True, align=True)
-    #     for mod in obj.modifiers:
-    #         if mod.type == 'MIRROR':
-    #             grid.label(text=f"")    
-    #             self.find_modifier_index(self,obj, mod.name)    
-    #             grid.label(text=f"",icon="MOD_MIRROR")
 
     def draw(self, context):
         layout = self.layout
@@ -258,12 +251,12 @@ class SelectObjectBool_props():
         ) # type: ignore
     
     cmd: bpy.props.StringProperty(default="simpleboolean", options={'HIDDEN'}) # type: ignore
-
     
     parent_bool: bpy.props.BoolProperty(
                                     name=get_translang('Parent','親子化'),
                                     default=True,
                                     ) # type: ignore
+    
     selected_mulch_bool: bpy.props.BoolProperty(
                                     name=get_translang('selected_mulch_bool','複数でブール'),
                                     default=True,
@@ -273,6 +266,7 @@ class SelectObjectBool_props():
                                     name=get_translang('move colection','コレクション移動'),
                                     default=True,
                                     ) # type: ignore
+    
     add_tryi_bool: bpy.props.BoolProperty(
                                     name=get_translang('Triangulation modifier added','三角化モディファイア追加'),
                                     default=True,
