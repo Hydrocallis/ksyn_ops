@@ -134,12 +134,13 @@ class BevelSettingsPanel(bpy.types.Panel):
         layout = self.layout
         layout.operator("object.selectobjectbevel_operator", text="Add/Modify Bevel Modifier")
 
-        obj = context.object
+        obj = bpy.context.object
         obj_props = obj.my_object_properties
 
         if obj is not None and obj.type == 'MESH':
-            layout.prop(obj_props, "bevel_width")
-            layout.prop(obj_props, "bevel_segments")
+            if obj.modifiers.get("ksyn_Bevel"):
+                layout.prop(obj_props, "bevel_width")
+                layout.prop(obj_props, "bevel_segments")
 
 # クラスを登録
 classes = (
