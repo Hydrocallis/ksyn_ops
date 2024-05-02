@@ -88,6 +88,29 @@ class MyObjectProperties(bpy.types.PropertyGroup):
             if obj.modifiers.get("ksyn_Bevel"):
                 return obj.modifiers["ksyn_Bevel"].segments
         return 0
+    
+    def get_bevel_limit_method(self):
+        obj = bpy.context.object
+        if obj and obj.type == 'MESH':
+            if obj.modifiers.get("ksyn_Bevel"):
+               if obj.modifiers.get("ksyn_Bevel"):
+                if obj.modifiers["ksyn_Bevel"].limit_method=="NONE":
+                    return 0
+                elif obj.modifiers["ksyn_Bevel"].limit_method == "WEIGHT":
+                    return 1
+                else:
+                    return 0
+            return 0
+        else:
+            return 0
+
+
+    def get_bevel_show_viewport(self):
+        obj = bpy.context.object
+        if obj and obj.type == 'MESH':
+            if obj.modifiers.get("ksyn_Bevel"):
+                return  obj.modifiers["ksyn_Bevel"].show_viewport
+        return True
 
     # プロパティのセット関数
     def set_bevel_width(self, value):
@@ -101,6 +124,29 @@ class MyObjectProperties(bpy.types.PropertyGroup):
         if obj and obj.type == 'MESH':
             if obj.modifiers.get("ksyn_Bevel"):
                 obj.modifiers["ksyn_Bevel"].segments = value
+
+
+
+    def set_bevel_limit_method(self, value):
+        obj = bpy.context.object
+        if obj and obj.type == 'MESH':
+            if obj.modifiers.get("ksyn_Bevel"):
+                # print("###value",value)
+                if value==0:
+                    obj.modifiers["ksyn_Bevel"].limit_method = "NONE"
+                elif value==1:
+                    obj.modifiers["ksyn_Bevel"].limit_method = "WEIGHT"
+                else:
+                    pass
+
+
+    def set_bevel_show_viewport(self, value):
+        obj = bpy.context.object
+        if obj and obj.type == 'MESH':
+            if obj.modifiers.get("ksyn_Bevel"):
+                obj.modifiers["ksyn_Bevel"].show_viewport = value
+
+
 
     bevel_width: bpy.props.FloatProperty(
         name="Bevel Width",
@@ -121,6 +167,26 @@ class MyObjectProperties(bpy.types.PropertyGroup):
         set=set_bevel_segments  # セット関数を指定
     ) # type: ignore
 
+
+    bevel_limit_method: bpy.props.EnumProperty(
+        name="Bevel Limit Method",
+        description="Limit method of the bevel modifier",
+        items=[('NONE', 'None', 'No limit method'),
+               ('WEIGHT', 'Weight', 'Limit by vertex weights')],
+        default='NONE',
+        get=get_bevel_limit_method,
+        set=set_bevel_limit_method
+    ) # type: ignore
+
+    bevel_show_viewport: bpy.props.BoolProperty(
+        name="Show in Viewport",
+        description="Show bevel modifier in the viewport",
+        default=True,
+        get=get_bevel_show_viewport,
+        set=set_bevel_show_viewport
+    ) # type: ignore
+
+
 # パネルを定義
 # パネルを定義する
 class BevelSettingsPanel(bpy.types.Panel):
@@ -130,8 +196,24 @@ class BevelSettingsPanel(bpy.types.Panel):
     bl_region_type = 'UI'
     bl_category = 'KSYN'
 
+    @staticmethod
+    def _active_context_member(context):
+        obj = context.object
+        if obj:
+            object_mode = obj.mode
+            if object_mode == 'POSE':
+                return "active_pose_bone"
+            elif object_mode == 'EDIT' and obj.type == 'ARMATURE':
+                return "active_bone"
+            else:
+                return "object"
+
+        return ""
+
     def draw(self, context):
         layout = self.layout
+        
+        view = context.space_data
         layout.operator("object.selectobjectbevel_operator", text="Add/Modify Bevel Modifier")
 
         obj = bpy.context.object
@@ -141,6 +223,11 @@ class BevelSettingsPanel(bpy.types.Panel):
             if obj.modifiers.get("ksyn_Bevel"):
                 layout.prop(obj_props, "bevel_width")
                 layout.prop(obj_props, "bevel_segments")
+                layout.prop(obj_props, "bevel_limit_method")
+                layout.prop(obj_props, "bevel_show_viewport", text="", icon = "RESTRICT_VIEW_OFF" if obj_props.bevel_show_viewport else "RESTRICT_VIEW_ON")
+
+
+
 
 # クラスを登録
 classes = (
